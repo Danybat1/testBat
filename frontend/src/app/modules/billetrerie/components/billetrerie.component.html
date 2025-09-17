@@ -1,0 +1,121 @@
+<div class="billetrerie-container">
+  <div class="row">
+    <div class="col-12">
+      <div class="page-header mb-4">
+        <h1 class="h3 mb-1">
+          <i class="fas fa-ticket-alt text-primary me-2"></i>
+          Billetrerie
+        </h1>
+        <p class="text-muted">Gestion des billets et réservations</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="card-title">Total Billets</h6>
+              <h3 class="mb-0">{{ ticketStats.total }}</h3>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-ticket-alt fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="card-title">Vendus</h6>
+              <h3 class="mb-0">{{ ticketStats.sold }}</h3>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-check-circle fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="card-title">Disponibles</h6>
+              <h3 class="mb-0">{{ ticketStats.available }}</h3>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-clock fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="card-title">Revenus</h6>
+              <h3 class="mb-0">{{ ticketStats.revenue | currency:'MAD':'symbol':'1.0-0' }}</h3>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-money-bill-wave fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Cards -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+          <h5 class="card-title">Créer un Billet</h5>
+          <p class="card-text">Créer de nouveaux billets pour les voyages</p>
+          <button class="btn btn-primary" (click)="onCreateTicket()">
+            <i class="fas fa-plus me-2"></i>
+            Nouveau Billet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-cogs fa-3x text-success mb-3"></i>
+          <h5 class="card-title">Gérer les Billets</h5>
+          <p class="card-text">Consulter et modifier les billets existants</p>
+          <button class="btn btn-success" (click)="onManageTickets()">
+            <i class="fas fa-list me-2"></i>
+            Gérer les Billets
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Development Notice -->
+  <div class="row">
+    <div class="col-12">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Module Billetrerie:</strong> Ce module sera développé pour gérer la vente de billets de transport, les réservations et le suivi des revenus.
+      </div>
+    </div>
+  </div>
+</div>

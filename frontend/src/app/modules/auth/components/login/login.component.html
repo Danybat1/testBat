@@ -1,0 +1,128 @@
+<!-- Login Page -->
+<div class="login-container">
+  <div class="container-fluid h-100">
+    <div class="row h-100 justify-content-center align-items-center">
+      <div class="col-12 col-md-6 col-lg-4">
+
+        <!-- Login Card -->
+        <div class="card login-card">
+          <div class="card-header text-center">
+            <div class="login-avatar mb-3">
+              <i class="bi bi-truck display-4 text-primary"></i>
+            </div>
+            <h4 class="card-title mb-1">FreightOps</h4>
+            <p class="card-subtitle text-muted">Système de gestion de fret</p>
+          </div>
+
+          <div class="card-body">
+            <!-- Login Form -->
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+              <!-- Username Field -->
+              <div class="form-group mb-3">
+                <label for="username" class="form-label">Nom d'utilisateur</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="username"
+                    class="form-control"
+                    formControlName="username"
+                    placeholder="Entrez votre nom d'utilisateur"
+                    autocomplete="username"
+                    data-cy="email-input">
+                  <span class="input-group-text">
+                    <i class="bi bi-person"></i>
+                  </span>
+                </div>
+                <div class="invalid-feedback"
+                     *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+                  {{ getErrorMessage('username') }}
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div class="form-group mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <div class="input-group">
+                  <input
+                    [type]="hidePassword ? 'password' : 'text'"
+                    id="password"
+                    class="form-control"
+                    formControlName="password"
+                    placeholder="Entrez votre mot de passe"
+                    autocomplete="current-password"
+                    data-cy="password-input">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="hidePassword = !hidePassword"
+                    [attr.aria-label]="'Hide password'"
+                    [attr.aria-pressed]="hidePassword">
+                    <i class="bi"
+                       [class.bi-eye]="hidePassword"
+                       [class.bi-eye-slash]="!hidePassword"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback"
+                     *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                  {{ getErrorMessage('password') }}
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="btn btn-primary w-100 login-button"
+                [disabled]="loading"
+                data-cy="login-button">
+                <div class="spinner-border spinner-border-sm me-2" role="status" *ngIf="loading">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <span *ngIf="!loading">Se connecter</span>
+                <span *ngIf="loading">Connexion en cours...</span>
+              </button>
+
+            </form>
+
+            <!-- Demo Credentials -->
+            <div class="demo-section mt-4" *ngIf="!loading">
+              <hr class="mb-3">
+              <p class="text-muted text-center mb-2">
+                <small>Comptes de démonstration :</small>
+              </p>
+              <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="fillDemoCredentials('admin')"
+                  type="button">
+                  Admin
+                </button>
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  (click)="fillDemoCredentials('agent')"
+                  type="button">
+                  Agent
+                </button>
+                <button
+                  class="btn btn-outline-warning btn-sm"
+                  (click)="fillDemoCredentials('finance')"
+                  type="button">
+                  Finance
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-3">
+          <small class="text-muted">
+            FreightOps v1.0.0 - Système de gestion de fret
+          </small>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

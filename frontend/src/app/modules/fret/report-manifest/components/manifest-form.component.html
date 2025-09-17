@@ -1,0 +1,642 @@
+<div class="manifest-form-container">
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="form-header mb-4">
+      <h2><i class="fas fa-file-alt"></i> Créer un Manifeste d'Expédition</h2>
+      <p class="text-muted">Remplissez tous les champs pour générer un manifeste complet</p>
+    </div>
+
+    <!-- Messages d'erreur et succès -->
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fas fa-exclamation-triangle"></i> {{ error }}
+      <button type="button" class="btn-close" (click)="error = null"></button>
+    </div>
+
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle"></i> {{ success }}
+      <button type="button" class="btn-close" (click)="success = null"></button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Création du manifeste en cours...</p>
+      </div>
+    </div>
+
+    <!-- Formulaire -->
+    <form [formGroup]="manifestForm" (ngSubmit)="onSubmit()" class="manifest-form">
+      
+      <!-- Section 1: Informations Générales -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5><i class="fas fa-info-circle"></i> Informations Générales</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="proformaNumber" class="form-label">Numéro Proforma *</label>
+                <input 
+                  type="text" 
+                  id="proformaNumber"
+                  formControlName="proformaNumber" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('proformaNumber')"
+                  placeholder="Ex: PRO-2024-001">
+                <div *ngIf="isFieldInvalid('proformaNumber')" class="invalid-feedback">
+                  {{ getFieldError('proformaNumber') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="transportMode" class="form-label">Mode de Transport *</label>
+                <select 
+                  id="transportMode"
+                  formControlName="transportMode" 
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('transportMode')">
+                  <option *ngFor="let mode of transportModes" [value]="mode.value">
+                    {{ mode.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group mb-3">
+                <label for="vehicleReference" class="form-label">Référence Véhicule *</label>
+                <input 
+                  type="text" 
+                  id="vehicleReference"
+                  formControlName="vehicleReference" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('vehicleReference')"
+                  placeholder="Ex: CM-1234-AB">
+                <div *ngIf="isFieldInvalid('vehicleReference')" class="invalid-feedback">
+                  {{ getFieldError('vehicleReference') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group mb-3">
+                <label for="driverName" class="form-label">Nom du Conducteur *</label>
+                <input 
+                  type="text" 
+                  id="driverName"
+                  formControlName="driverName" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('driverName')"
+                  placeholder="Ex: Jean MBALLA">
+                <div *ngIf="isFieldInvalid('driverName')" class="invalid-feedback">
+                  {{ getFieldError('driverName') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group mb-3">
+                <label for="driverPhone" class="form-label">Téléphone Conducteur *</label>
+                <input 
+                  type="tel" 
+                  id="driverPhone"
+                  formControlName="driverPhone" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('driverPhone')"
+                  placeholder="Ex: +237 690 123 456">
+                <div *ngIf="isFieldInvalid('driverPhone')" class="invalid-feedback">
+                  {{ getFieldError('driverPhone') }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="scheduledDeparture" class="form-label">Départ Prévu *</label>
+                <input 
+                  type="datetime-local" 
+                  id="scheduledDeparture"
+                  formControlName="scheduledDeparture" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('scheduledDeparture')">
+                <div *ngIf="isFieldInvalid('scheduledDeparture')" class="invalid-feedback">
+                  {{ getFieldError('scheduledDeparture') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="scheduledArrival" class="form-label">Arrivée Prévue *</label>
+                <input 
+                  type="datetime-local" 
+                  id="scheduledArrival"
+                  formControlName="scheduledArrival" 
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('scheduledArrival')">
+                <div *ngIf="isFieldInvalid('scheduledArrival')" class="invalid-feedback">
+                  {{ getFieldError('scheduledArrival') }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Parties Impliquées -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5><i class="fas fa-users"></i> Parties Impliquées</h5>
+        </div>
+        <div class="card-body">
+          
+          <!-- Expéditeur -->
+          <div class="party-section mb-4" formGroupName="shipper">
+            <h6 class="text-primary"><i class="fas fa-arrow-up"></i> Expéditeur</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Nom de l'entreprise *</label>
+                  <input 
+                    type="text" 
+                    formControlName="name" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('shipper', 'name')"
+                    placeholder="Ex: SARL EXPORT CAMEROUN">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Personne de contact *</label>
+                  <input 
+                    type="text" 
+                    formControlName="contact" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('shipper', 'contact')"
+                    placeholder="Ex: M. Pierre NKOMO">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group mb-3">
+                  <label class="form-label">Adresse *</label>
+                  <textarea 
+                    formControlName="address" 
+                    class="form-control" 
+                    rows="2"
+                    [class.is-invalid]="isNestedFieldInvalid('shipper', 'address')"
+                    placeholder="Adresse complète"></textarea>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label class="form-label">Téléphone *</label>
+                  <input 
+                    type="tel" 
+                    formControlName="phone" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('shipper', 'phone')"
+                    placeholder="+237 233 456 789">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Destinataire -->
+          <div class="party-section mb-4" formGroupName="consignee">
+            <h6 class="text-success"><i class="fas fa-arrow-down"></i> Destinataire</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Nom de l'entreprise *</label>
+                  <input 
+                    type="text" 
+                    formControlName="name" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('consignee', 'name')"
+                    placeholder="Ex: IMPORT SERVICES GABON">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Personne de contact *</label>
+                  <input 
+                    type="text" 
+                    formControlName="contact" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('consignee', 'contact')"
+                    placeholder="Ex: Mme Marie OBIANG">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group mb-3">
+                  <label class="form-label">Adresse *</label>
+                  <textarea 
+                    formControlName="address" 
+                    class="form-control" 
+                    rows="2"
+                    [class.is-invalid]="isNestedFieldInvalid('consignee', 'address')"
+                    placeholder="Adresse complète"></textarea>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label class="form-label">Téléphone *</label>
+                  <input 
+                    type="tel" 
+                    formControlName="phone" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('consignee', 'phone')"
+                    placeholder="+241 01 234 567">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Client Donneur d'Ordre -->
+          <div class="party-section mb-4" formGroupName="client">
+            <h6 class="text-warning"><i class="fas fa-handshake"></i> Client Donneur d'Ordre</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Nom de l'entreprise *</label>
+                  <input 
+                    type="text" 
+                    formControlName="name" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('client', 'name')"
+                    placeholder="Ex: TRADING COMPANY SARL">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Référence Client</label>
+                  <input 
+                    type="text" 
+                    formControlName="reference" 
+                    class="form-control"
+                    placeholder="Ex: CLI-2024-001">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label class="form-label">Personne de contact *</label>
+                  <input 
+                    type="text" 
+                    formControlName="contact" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('client', 'contact')"
+                    placeholder="Ex: M. Paul ESSOMBA">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label class="form-label">Téléphone *</label>
+                  <input 
+                    type="tel" 
+                    formControlName="phone" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('client', 'phone')"
+                    placeholder="+237 699 888 777">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label class="form-label">Adresse *</label>
+                  <textarea 
+                    formControlName="address" 
+                    class="form-control" 
+                    rows="2"
+                    [class.is-invalid]="isNestedFieldInvalid('client', 'address')"
+                    placeholder="Adresse complète"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent -->
+          <div class="party-section" formGroupName="agent">
+            <h6 class="text-info"><i class="fas fa-user-tie"></i> Agent</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Nom de l'entreprise *</label>
+                  <input 
+                    type="text" 
+                    formControlName="name" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('agent', 'name')"
+                    placeholder="Ex: ENTREPOT LOGISTIQUE DOUALA">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Personne de contact *</label>
+                  <input 
+                    type="text" 
+                    formControlName="contact" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('agent', 'contact')"
+                    placeholder="Ex: M. Joseph MANGA">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group mb-3">
+                  <label class="form-label">Adresse *</label>
+                  <textarea 
+                    formControlName="address" 
+                    class="form-control" 
+                    rows="2"
+                    [class.is-invalid]="isNestedFieldInvalid('agent', 'address')"
+                    placeholder="Adresse complète"></textarea>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label class="form-label">Téléphone *</label>
+                  <input 
+                    type="tel" 
+                    formControlName="phone" 
+                    class="form-control"
+                    [class.is-invalid]="isNestedFieldInvalid('agent', 'phone')"
+                    placeholder="+237 233 111 222">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Marchandises -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5><i class="fas fa-boxes"></i> Marchandises</h5>
+          <button type="button" class="btn btn-primary btn-sm" (click)="addGoodsItem()">
+            <i class="fas fa-plus"></i> Ajouter Article
+          </button>
+        </div>
+        <div class="card-body">
+          <div formArrayName="goods">
+            <div *ngFor="let goodsItem of goodsFormArray.controls; let i = index" 
+                 [formGroupName]="i" 
+                 class="goods-item mb-4 p-3 border rounded">
+              
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Article {{ i + 1 }}</h6>
+                <div class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-secondary" (click)="generateTrackingNumber(i)">
+                    <i class="fas fa-barcode"></i> Générer N° Suivi
+                  </button>
+                  <button type="button" class="btn btn-outline-danger" (click)="removeGoodsItem(i)" 
+                          [disabled]="goodsFormArray.length === 1">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group mb-3">
+                    <label class="form-label">N° de Suivi *</label>
+                    <input 
+                      type="text" 
+                      formControlName="trackingNumber" 
+                      class="form-control"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'trackingNumber')"
+                      placeholder="TRK12345678ABCD">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Type d'Emballage *</label>
+                    <select 
+                      formControlName="packagingType" 
+                      class="form-select"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'packagingType')">
+                      <option *ngFor="let type of packagingTypes" [value]="type.value">
+                        {{ type.label }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Nombre de Colis *</label>
+                    <input 
+                      type="number" 
+                      formControlName="packageCount" 
+                      class="form-control"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'packageCount')"
+                      min="1">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Description *</label>
+                    <textarea 
+                      formControlName="description" 
+                      class="form-control" 
+                      rows="2"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'description')"
+                      placeholder="Description détaillée de la marchandise"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Poids Brut (kg) *</label>
+                    <input 
+                      type="number" 
+                      formControlName="grossWeight" 
+                      class="form-control"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'grossWeight')"
+                      step="0.01" 
+                      min="0.01">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Volume (m³) *</label>
+                    <input 
+                      type="number" 
+                      formControlName="volume" 
+                      class="form-control"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'volume')"
+                      step="0.001" 
+                      min="0.001"
+                      (blur)="calculateVolumetricWeight(i)">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Poids Volumétrique (kg) *</label>
+                    <input 
+                      type="number" 
+                      formControlName="volumetricWeight" 
+                      class="form-control"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'volumetricWeight')"
+                      step="0.01" 
+                      min="0.01" 
+                      readonly>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Valeur Déclarée (XAF) *</label>
+                    <input 
+                      type="number" 
+                      formControlName="declaredValue" 
+                      class="form-control"
+                      [class.is-invalid]="isGoodsFieldInvalid(i, 'declaredValue')"
+                      min="0">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label class="form-label">N° Conteneur</label>
+                    <input 
+                      type="text" 
+                      formControlName="containerNumber" 
+                      class="form-control"
+                      placeholder="Ex: CONT-001-2024">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Remarques</label>
+                    <input 
+                      type="text" 
+                      formControlName="remarks" 
+                      class="form-control"
+                      placeholder="Remarques particulières">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Instructions et Remarques -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5><i class="fas fa-clipboard-list"></i> Instructions et Remarques</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="deliveryInstructions" class="form-label">Instructions de Livraison</label>
+                <textarea 
+                  id="deliveryInstructions"
+                  formControlName="deliveryInstructions" 
+                  class="form-control" 
+                  rows="4"
+                  placeholder="Instructions spéciales pour la livraison..."></textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="generalRemarks" class="form-label">Remarques Générales</label>
+                <textarea 
+                  id="generalRemarks"
+                  formControlName="generalRemarks" 
+                  class="form-control" 
+                  rows="4"
+                  placeholder="Remarques générales sur le transport..."></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="status" class="form-label">Statut *</label>
+                <select 
+                  id="status"
+                  formControlName="status" 
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('status')">
+                  <option *ngFor="let status of statusOptions" [value]="status.value">
+                    {{ status.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Pièces Jointes -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5><i class="fas fa-paperclip"></i> Pièces Jointes</h5>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="addAttachment()">
+            <i class="fas fa-plus"></i> Ajouter Document
+          </button>
+        </div>
+        <div class="card-body">
+          <div formArrayName="attachments">
+            <div *ngFor="let attachment of attachmentsFormArray.controls; let i = index" 
+                 class="d-flex align-items-center mb-2">
+              <div class="flex-grow-1 me-2">
+                <input 
+                  type="text" 
+                  [formControlName]="i" 
+                  class="form-control"
+                  placeholder="Nom du document (ex: Facture commerciale)">
+              </div>
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeAttachment(i)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <div *ngIf="attachmentsFormArray.length === 0" class="text-muted">
+              Aucune pièce jointe ajoutée
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions d-flex justify-content-between align-items-center">
+        <div>
+          <button type="button" class="btn btn-outline-secondary me-2" (click)="onReset()">
+            <i class="fas fa-undo"></i> Réinitialiser
+          </button>
+          <button type="button" class="btn btn-outline-info me-2" (click)="onPreview()" 
+                  [disabled]="manifestForm.invalid">
+            <i class="fas fa-eye"></i> Prévisualiser
+          </button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-warning me-2" (click)="onSaveDraft()" 
+                  [disabled]="isLoading">
+            <i class="fas fa-save"></i> Sauvegarder Brouillon
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="manifestForm.invalid || isLoading">
+            <i class="fas fa-check"></i> Créer Manifeste
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

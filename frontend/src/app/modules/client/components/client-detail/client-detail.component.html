@@ -1,0 +1,199 @@
+<!-- Client Detail Component -->
+<div class="client-detail-container">
+  <div class="container-fluid">
+    
+    <!-- Loading State -->
+    <div class="loading-container text-center py-5" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Chargement des détails du client...</p>
+    </div>
+
+    <!-- Client Details -->
+    <div *ngIf="!loading && client">
+      
+      <!-- Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="d-flex align-items-center">
+              <button 
+                type="button"
+                class="btn btn-outline-primary me-3"
+                (click)="goBack()">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+              <div class="header-info">
+                <h1 class="h3 mb-1">{{ client.name }}</h1>
+                <p class="text-muted mb-0">
+                  Client ID: {{ client.id }}
+                </p>
+              </div>
+            </div>
+            
+            <div class="header-actions">
+              <button 
+                type="button"
+                class="btn btn-outline-primary me-2"
+                (click)="editClient()">
+                <i class="bi bi-pencil me-1"></i>
+                Modifier
+              </button>
+              <button 
+                type="button"
+                class="btn btn-outline-danger"
+                (click)="deleteClient()">
+                <i class="bi bi-trash me-1"></i>
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Card -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card status-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h4 class="mb-2">Statut du client</h4>
+                  <span [class]="'badge fs-6 ' + getStatusClass(client.isActive)">
+                    {{ getStatusLabel(client.isActive) }}
+                  </span>
+                </div>
+                <div>
+                  <i class="bi bi-person-circle display-4 text-primary"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Information Cards -->
+      <div class="row">
+        
+        <!-- Basic Information -->
+        <div class="col-12 col-lg-6 mb-4">
+          <div class="card info-card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Informations générales
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Nom du client</label>
+                  <span class="value">{{ client.name }}</span>
+                </div>
+                <div class="info-item" *ngIf="client.contactPerson">
+                  <label>Personne de contact</label>
+                  <span class="value">{{ client.contactPerson }}</span>
+                </div>
+                <div class="info-item" *ngIf="client.email">
+                  <label>Email</label>
+                  <span class="value">
+                    <a href="mailto:{{ client.email }}" class="text-decoration-none">
+                      {{ client.email }}
+                    </a>
+                  </span>
+                </div>
+                <div class="info-item" *ngIf="client.contactNumber">
+                  <label>Téléphone</label>
+                  <span class="value">
+                    <a href="tel:{{ client.contactNumber }}" class="text-decoration-none">
+                      {{ client.contactNumber }}
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="col-12 col-lg-6 mb-4">
+          <div class="card info-card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-geo-alt me-2"></i>
+                Adresse
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="address-info">
+                <div class="address-item" *ngIf="client.address">
+                  <i class="bi bi-house-door address-icon"></i>
+                  <div class="address-content">
+                    <p class="address-text">{{ client.address }}</p>
+                  </div>
+                </div>
+                <div class="address-item" *ngIf="client.city">
+                  <i class="bi bi-building address-icon"></i>
+                  <div class="address-content">
+                    <p class="address-text">{{ client.city.name }}, {{ client.city.country }}</p>
+                  </div>
+                </div>
+                <div class="address-item" *ngIf="client.postalCode">
+                  <i class="bi bi-mailbox address-icon"></i>
+                  <div class="address-content">
+                    <p class="address-text">Code postal: {{ client.postalCode }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="col-12 mb-4" *ngIf="client.description || client.notes">
+          <div class="card info-card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-file-text me-2"></i>
+                Informations supplémentaires
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="additional-info">
+                <div *ngIf="client.description" class="info-section">
+                  <h6>Description</h6>
+                  <p class="description-text">{{ client.description }}</p>
+                </div>
+                <div *ngIf="client.notes" class="info-section">
+                  <h6>Notes</h6>
+                  <p class="notes-text">{{ client.notes }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LTA History (placeholder) -->
+        <div class="col-12 mb-4">
+          <div class="card info-card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-clock-history me-2"></i>
+                Historique des LTA
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="history-placeholder text-center py-3">
+                <i class="bi bi-truck history-icon fs-1 text-muted"></i>
+                <p class="text-muted mt-2">L'historique des LTA sera disponible prochainement</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div> 

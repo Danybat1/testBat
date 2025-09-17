@@ -1,0 +1,284 @@
+// E-TRANS Angular Material Theme
+// Basé sur la palette de couleurs du logo E-TRANS
+
+@use '@angular/material' as mat;
+
+// Import des variables E-TRANS
+@import 'variables';
+
+// Include core styles
+@include mat.core();
+
+// Définition des palettes de couleurs E-TRANS
+$etrans-primary-palette: (
+  50: #e3f2fd,
+  100: #bbdefb,
+  200: #90caf9,
+  300: #64b5f6,
+  400: #42a5f5,
+  500: #1e88e5, // E-TRANS Blue Primary
+  600: #1976d2,
+  700: #1565c0,
+  800: #0d47a1,
+  900: #1a237e, // E-TRANS Blue Dark
+  A100: #82b1ff,
+  A200: #448aff,
+  A400: #2979ff,
+  A700: #2962ff,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+$etrans-accent-palette: (
+  50: #ffebee,
+  100: #ffcdd2,
+  200: #ef9a9a,
+  300: #e57373,
+  400: #ef5350,
+  500: #f44336, // E-TRANS Red Accent
+  600: #e53935,
+  700: #d32f2f,
+  800: #c62828,
+  900: #b71c1c,
+  A100: #ff8a80,
+  A200: #ff5252,
+  A400: #ff1744,
+  A700: #d50000,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+$etrans-warn-palette: (
+  50: #fff3e0,
+  100: #ffe0b2,
+  200: #ffcc80,
+  300: #ffb74d,
+  400: #ffa726,
+  500: #ff9800,
+  600: #fb8c00,
+  700: #f57c00,
+  800: #ef6c00,
+  900: #e65100,
+  A100: #ffd180,
+  A200: #ffab40,
+  A400: #ff9100,
+  A700: #ff6d00,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: rgba(black, 0.87),
+    700: rgba(black, 0.87),
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: rgba(black, 0.87),
+    A700: rgba(black, 0.87),
+  )
+);
+
+// Création des palettes Material
+$etrans-primary: mat.define-palette($etrans-primary-palette, 500, 300, 900);
+$etrans-accent: mat.define-palette($etrans-accent-palette, 500, 300, 900);
+$etrans-warn: mat.define-palette($etrans-warn-palette, 500, 300, 900);
+
+// Thème E-TRANS
+$etrans-theme: mat.define-light-theme((
+  color: (
+    primary: $etrans-primary,
+    accent: $etrans-accent,
+    warn: $etrans-warn,
+  ),
+  typography: mat.define-typography-config(
+    $font-family: 'Inter, sans-serif',
+    $headline-1: mat.define-typography-level(2.25rem, 2.5rem, 300),
+    $headline-2: mat.define-typography-level(1.875rem, 2.25rem, 400),
+    $headline-3: mat.define-typography-level(1.5rem, 2rem, 500),
+    $headline-4: mat.define-typography-level(1.25rem, 1.75rem, 500),
+    $headline-5: mat.define-typography-level(1.125rem, 1.5rem, 500),
+    $headline-6: mat.define-typography-level(1rem, 1.375rem, 600),
+    $subtitle-1: mat.define-typography-level(1rem, 1.5rem, 500),
+    $subtitle-2: mat.define-typography-level(0.875rem, 1.25rem, 500),
+    $body-1: mat.define-typography-level(0.875rem, 1.5rem, 400),
+    $body-2: mat.define-typography-level(0.8125rem, 1.25rem, 400),
+    $caption: mat.define-typography-level(0.75rem, 1rem, 400),
+    $button: mat.define-typography-level(0.875rem, 1rem, 500),
+    $overline: mat.define-typography-level(0.75rem, 1rem, 400),
+  ),
+  density: 0,
+));
+
+// Application du thème
+@include mat.all-component-themes($etrans-theme);
+
+// Personnalisations spécifiques E-TRANS
+.mat-mdc-tab-group {
+  .mat-mdc-tab-header {
+    background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+    
+    .mat-mdc-tab {
+      color: rgba(255, 255, 255, 0.7);
+      
+      &.mdc-tab--active {
+        color: white;
+      }
+    }
+    
+    .mat-mdc-tab-header-pagination {
+      display: none;
+    }
+  }
+}
+
+.mat-mdc-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  
+  .mat-mdc-card-header {
+    background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    
+    .mat-mdc-card-title {
+      color: white;
+    }
+    
+    .mat-mdc-card-subtitle {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+.mat-mdc-button {
+  border-radius: 8px !important;
+  font-weight: 500;
+  text-transform: none;
+  
+  &.mat-primary {
+    background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+    color: white;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba($etrans-blue-primary, 0.4);
+    }
+  }
+  
+  &.mat-accent {
+    background: $etrans-red-accent;
+    color: white;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba($etrans-red-accent, 0.4);
+    }
+  }
+}
+
+.mat-mdc-raised-button {
+  &.mat-primary {
+    background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+  }
+}
+
+.mat-mdc-fab {
+  &.mat-primary {
+    background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+  }
+}
+
+.mat-mdc-chip {
+  border-radius: 16px;
+  
+  &.mat-mdc-chip-selected {
+    &.mat-primary {
+      background-color: $etrans-blue-primary;
+      color: white;
+    }
+    
+    &.mat-accent {
+      background-color: $etrans-red-accent;
+      color: white;
+    }
+  }
+}
+
+.mat-mdc-progress-bar {
+  .mdc-linear-progress__bar-inner {
+    border-color: $etrans-blue-primary;
+  }
+}
+
+.mat-mdc-progress-spinner {
+  circle {
+    stroke: $etrans-blue-primary;
+  }
+}
+
+// Styles pour les formulaires
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    border-radius: 8px;
+  }
+  
+  &.mat-focused {
+    .mat-mdc-form-field-focus-overlay {
+      background-color: rgba($etrans-blue-primary, 0.12);
+    }
+  }
+}
+
+// Styles pour les snackbars
+.mat-mdc-snack-bar-container {
+  border-radius: 8px;
+  
+  &.success-snackbar {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  &.error-snackbar {
+    background-color: $etrans-red-accent;
+    color: white;
+  }
+  
+  &.warning-snackbar {
+    background-color: $warning-500;
+    color: white;
+  }
+  
+  &.info-snackbar {
+    background-color: $etrans-blue-primary;
+    color: white;
+  }
+}

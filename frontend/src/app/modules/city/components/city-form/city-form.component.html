@@ -1,0 +1,79 @@
+<div class="city-form-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-geo-alt"></i>
+      {{ isEditMode ? 'Modifier la Ville' : 'Nouvelle Ville' }}
+    </h2>
+    <button class="btn btn-outline-secondary" (click)="onCancel()">
+      <i class="bi bi-arrow-left"></i>
+      Retour à la liste
+    </button>
+  </div>
+
+  <div class="form-container" *ngIf="!loading">
+    <form [formGroup]="cityForm" (ngSubmit)="onSubmit()" class="city-form">
+      <div class="form-group">
+        <label for="name" class="form-label">
+          <i class="bi bi-building"></i>
+          Nom de la ville *
+        </label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="cityForm.get('name')?.invalid && cityForm.get('name')?.touched"
+          placeholder="Entrez le nom de la ville">
+        <div class="invalid-feedback" *ngIf="getFieldError('name')">
+          {{ getFieldError('name') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="iataCode" class="form-label">
+          <i class="bi bi-airplane"></i>
+          Code IATA *
+        </label>
+        <input
+          type="text"
+          id="iataCode"
+          formControlName="iataCode"
+          class="form-control iata-input"
+          [class.is-invalid]="cityForm.get('iataCode')?.invalid && cityForm.get('iataCode')?.touched"
+          placeholder="Ex: CDG, JFK, DXB"
+          maxlength="3"
+          (input)="onIataCodeInput($event)">
+        <div class="form-help">
+          Le code IATA doit contenir exactement 3 lettres majuscules
+        </div>
+        <div class="invalid-feedback" *ngIf="getFieldError('iataCode')">
+          {{ getFieldError('iataCode') }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onCancel()"
+          [disabled]="submitting">
+          <i class="bi bi-x-circle"></i>
+          Annuler
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="cityForm.invalid || submitting">
+          <i class="bi bi-check-circle" *ngIf="!submitting"></i>
+          <i class="bi bi-arrow-clockwise spin" *ngIf="submitting"></i>
+          {{ submitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Chargement des données...</p>
+  </div>
+</div>

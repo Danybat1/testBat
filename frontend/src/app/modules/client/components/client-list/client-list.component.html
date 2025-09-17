@@ -1,0 +1,75 @@
+<div class="client-list-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-people"></i>
+      Gestion des Clients
+    </h2>
+    <button class="btn btn-primary" (click)="navigateToNewClient()">
+      <i class="bi bi-plus-circle"></i>
+      Nouveau Client
+    </button>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input 
+        type="text" 
+        placeholder="Rechercher un client..." 
+        [(ngModel)]="searchTerm"
+        class="search-input">
+    </div>
+  </div>
+
+  <div class="table-container" *ngIf="!loading">
+    <table class="clients-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Adresse</th>
+          <th>Téléphone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of filteredClients">
+          <td>{{ client.id }}</td>
+          <td>{{ client.name }}</td>
+          <td>{{ client.address }}</td>
+          <td>{{ client.contactNumber }}</td>
+          <td class="actions">
+            <button 
+              class="btn btn-sm btn-outline-info me-1" 
+              (click)="viewClient(client.id!)"
+              title="Voir détails">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-primary me-1" 
+              (click)="editClient(client.id!)"
+              title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-danger" 
+              (click)="deleteClient(client.id!)"
+              title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="no-results" *ngIf="filteredClients.length === 0">
+      <i class="bi bi-inbox"></i>
+      <p>Aucun client trouvé</p>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Chargement des clients...</p>
+  </div>
+</div>

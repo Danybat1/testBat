@@ -1,0 +1,91 @@
+<div class="client-form-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-people"></i>
+      {{ isEditMode ? 'Modifier le Client' : 'Nouveau Client' }}
+    </h2>
+    <button class="btn btn-outline-secondary" (click)="onCancel()">
+      <i class="bi bi-arrow-left"></i>
+      Retour à la liste
+    </button>
+  </div>
+
+  <div class="form-container" *ngIf="!loading">
+    <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="client-form">
+      <div class="form-group">
+        <label for="name" class="form-label">
+          <i class="bi bi-person"></i>
+          Nom du client *
+        </label>
+        <input
+          type="text"
+          id="name"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched"
+          placeholder="Entrez le nom du client">
+        <div class="invalid-feedback" *ngIf="getFieldError('name')">
+          {{ getFieldError('name') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address" class="form-label">
+          <i class="bi bi-geo-alt"></i>
+          Adresse *
+        </label>
+        <textarea
+          id="address"
+          formControlName="address"
+          class="form-control"
+          rows="3"
+          [class.is-invalid]="clientForm.get('address')?.invalid && clientForm.get('address')?.touched"
+          placeholder="Entrez l'adresse complète du client"></textarea>
+        <div class="invalid-feedback" *ngIf="getFieldError('address')">
+          {{ getFieldError('address') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="contactNumber" class="form-label">
+          <i class="bi bi-telephone"></i>
+          Numéro de téléphone *
+        </label>
+        <input
+          type="tel"
+          id="contactNumber"
+          formControlName="contactNumber"
+          class="form-control"
+          [class.is-invalid]="clientForm.get('contactNumber')?.invalid && clientForm.get('contactNumber')?.touched"
+          placeholder="Ex: +33 1 23 45 67 89">
+        <div class="invalid-feedback" *ngIf="getFieldError('contactNumber')">
+          {{ getFieldError('contactNumber') }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onCancel()"
+          [disabled]="submitting">
+          <i class="bi bi-x-circle"></i>
+          Annuler
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="clientForm.invalid || submitting">
+          <i class="bi bi-check-circle" *ngIf="!submitting"></i>
+          <i class="bi bi-arrow-clockwise spin" *ngIf="submitting"></i>
+          {{ submitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Chargement des données...</p>
+  </div>
+</div>

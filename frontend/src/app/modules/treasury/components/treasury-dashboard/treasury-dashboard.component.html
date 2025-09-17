@@ -1,0 +1,456 @@
+<div class="treasury-dashboard">
+  <div class="dashboard-header">
+    <h1>Tableau de Bord - Trésorerie</h1>
+    <p>Vue d'ensemble de votre situation financière</p>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <mat-tab-group #tabGroup class="treasury-tabs" animationDuration="300ms">
+    <mat-tab label="Dashboard">
+      <ng-template matTabContent>
+
+  <div class="stats-grid" *ngIf="!loading">
+    <!-- Total Balance Card -->
+    <mat-card class="stat-card primary">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.totalBalance) }}</h3>
+            <p>Solde Total</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Cash Balance Card -->
+    <mat-card class="stat-card success">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">money</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.totalCashBalance) }}</h3>
+            <p>Caisses ({{ stats.activeCashBoxes }})</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Bank Balance Card -->
+    <mat-card class="stat-card info">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">account_balance</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.totalBankBalance) }}</h3>
+            <p>Banques ({{ stats.activeBankAccounts }})</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Monthly Income Card -->
+    <mat-card class="stat-card success">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">trending_up</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.monthlyIncome) }}</h3>
+            <p>Recettes du mois</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Monthly Expense Card -->
+    <mat-card class="stat-card warning">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">trending_down</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.monthlyExpense) }}</h3>
+            <p>Dépenses du mois</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Net Flow Card -->
+    <mat-card class="stat-card" [ngClass]="stats.monthlyNetFlow >= 0 ? 'success' : 'danger'">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">
+            {{ stats.monthlyNetFlow >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+          </mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.monthlyNetFlow) }}</h3>
+            <p>Flux net du mois</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="content-grid" *ngIf="!loading">
+    <!-- Cash Boxes Overview -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>Caisses</mat-card-title>
+        <button mat-button routerLink="/treasury/cash-boxes">
+          <mat-icon>arrow_forward</mat-icon>
+          Voir tout
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let cashBox of cashBoxes">
+            <div class="item-info">
+              <h4>{{ cashBox.name }}</h4>
+              <p>{{ cashBox.description || 'Aucune description' }}</p>
+            </div>
+            <div class="item-status">
+              <span class="balance" [ngClass]="getBalanceColor(cashBox.currentBalance)">
+                {{ formatCurrency(cashBox.currentBalance) }}
+              </span>
+              <mat-chip [color]="cashBox.active ? 'primary' : 'basic'" selected>
+                {{ cashBox.active ? 'Active' : 'Inactive' }}
+              </mat-chip>
+            </div>
+          </div>
+          <div *ngIf="cashBoxes.length === 0" class="no-data">
+            Aucune caisse active
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Bank Accounts Overview -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>Comptes Bancaires</mat-card-title>
+        <button mat-button routerLink="/treasury/bank-accounts">
+          <mat-icon>arrow_forward</mat-icon>
+          Voir tout
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let account of bankAccounts">
+            <div class="item-info">
+              <h4>{{ account.accountName }}</h4>
+              <p>{{ account.bankName }} - {{ account.accountNumber }}</p>
+            </div>
+            <div class="item-status">
+              <span class="balance" [ngClass]="getBalanceColor(account.currentBalance)">
+                {{ formatCurrency(account.currentBalance) }}
+              </span>
+              <mat-chip [color]="account.active ? 'primary' : 'basic'" selected>
+                {{ account.active ? 'Actif' : 'Inactif' }}
+              </mat-chip>
+            </div>
+          </div>
+          <div *ngIf="bankAccounts.length === 0" class="no-data">
+            Aucun compte bancaire actif
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Transactions -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>Transactions Récentes</mat-card-title>
+        <button mat-button routerLink="/treasury/transactions">
+          <mat-icon>arrow_forward</mat-icon>
+          Voir tout
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let transaction of recentTransactions">
+            <div class="item-info">
+              <div class="transaction-header">
+                <mat-icon [color]="getTransactionTypeColor(transaction.type)">
+                  {{ getTransactionTypeIcon(transaction.type) }}
+                </mat-icon>
+                <h4>{{ transaction.reference }}</h4>
+              </div>
+              <p>{{ transaction.description }} - {{ formatDate(transaction.transactionDate) }}</p>
+            </div>
+            <div class="item-status">
+              <span class="amount" [ngClass]="transaction.type === 'INCOME' ? 'success' : 'warning'">
+                {{ transaction.type === 'EXPENSE' ? '-' : '+' }}{{ formatCurrency(transaction.amount) }}
+              </span>
+              <mat-chip [color]="getTransactionTypeColor(transaction.type)" selected>
+                {{ transaction.type }}
+              </mat-chip>
+            </div>
+          </div>
+          <div *ngIf="recentTransactions.length === 0" class="no-data">
+            Aucune transaction récente
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Low Balance Alerts -->
+    <mat-card class="content-card alert-card" *ngIf="lowBalanceAlerts.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="warning-icon">warning</mat-icon>
+          Alertes Solde Faible
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item alert" *ngFor="let alert of lowBalanceAlerts">
+            <div class="item-info">
+              <h4>{{ alert.name || alert.accountName }}</h4>
+              <p>{{ alert.type === 'cashbox' ? 'Caisse' : 'Compte bancaire' }}</p>
+            </div>
+            <div class="item-status">
+              <span class="balance danger">{{ formatCurrency(alert.currentBalance) }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions" *ngIf="!loading">
+        <h2>Actions rapides</h2>
+        <div class="actions-grid">
+          <button mat-raised-button color="primary" routerLink="/treasury/caisse-operation">
+            <mat-icon>cash_register</mat-icon>
+            Opération de Caisse
+          </button>
+          <button mat-raised-button color="accent" routerLink="/treasury/cash-statement">
+            <mat-icon>receipt_long</mat-icon>
+            Relevé de Caisse
+          </button>
+          <button mat-raised-button (click)="switchToTab(1)">
+            <mat-icon>list</mat-icon>
+            Voir Transactions
+          </button>
+          <button mat-raised-button (click)="switchToTab(2)">
+            <mat-icon>account_balance_wallet</mat-icon>
+            Gérer Caisses
+          </button>
+          <button mat-raised-button (click)="switchToTab(3)">
+            <mat-icon>account_balance</mat-icon>
+            Comptes Bancaires
+          </button>
+        </div>
+      </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Transactions Tab -->
+    <mat-tab label="Transactions">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <div class="tab-header">
+            <h2><mat-icon>list</mat-icon> Gestion des Transactions</h2>
+            <button mat-raised-button color="primary" routerLink="/treasury/caisse-operation">
+              <mat-icon>add</mat-icon>
+              Nouvelle Transaction
+            </button>
+          </div>
+          
+          <!-- Filters -->
+          <mat-card class="filter-card">
+            <mat-card-content>
+              <div class="filter-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Type</mat-label>
+                  <mat-select [(value)]="transactionFilter.type">
+                    <mat-option value="">Tous</mat-option>
+                    <mat-option value="INCOME">Recettes</mat-option>
+                    <mat-option value="EXPENSE">Dépenses</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline">
+                  <mat-label>Date début</mat-label>
+                  <input matInput [matDatepicker]="startPicker" [(ngModel)]="transactionFilter.startDate">
+                  <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #startPicker></mat-datepicker>
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline">
+                  <mat-label>Date fin</mat-label>
+                  <input matInput [matDatepicker]="endPicker" [(ngModel)]="transactionFilter.endDate">
+                  <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #endPicker></mat-datepicker>
+                </mat-form-field>
+                
+                <button mat-raised-button color="primary" (click)="filterTransactions()">
+                  <mat-icon>search</mat-icon>
+                  Filtrer
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          
+          <!-- Transactions List -->
+          <mat-card class="transactions-card">
+            <mat-card-content>
+              <div class="transaction-item" *ngFor="let transaction of filteredTransactions">
+                <div class="transaction-main">
+                  <div class="transaction-icon">
+                    <mat-icon [color]="getTransactionTypeColor(transaction.type)">
+                      {{ getTransactionTypeIcon(transaction.type) }}
+                    </mat-icon>
+                  </div>
+                  <div class="transaction-details">
+                    <h4>{{ transaction.reference }}</h4>
+                    <p>{{ transaction.description }}</p>
+                    <small>{{ formatDate(transaction.transactionDate) }}</small>
+                  </div>
+                  <div class="transaction-amount">
+                    <span class="amount" [ngClass]="transaction.type === 'INCOME' ? 'success' : 'warning'">
+                      {{ transaction.type === 'EXPENSE' ? '-' : '+' }}{{ formatCurrency(transaction.amount) }}
+                    </span>
+                    <mat-chip [color]="getTransactionTypeColor(transaction.type)" selected>
+                      {{ transaction.type === 'INCOME' ? 'Recette' : 'Dépense' }}
+                    </mat-chip>
+                  </div>
+                </div>
+                <mat-divider></mat-divider>
+              </div>
+              <div *ngIf="filteredTransactions.length === 0" class="no-data">
+                <mat-icon>receipt_long</mat-icon>
+                <p>Aucune transaction trouvée</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Cash Boxes Tab -->
+    <mat-tab label="Caisses">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <div class="tab-header">
+            <h2><mat-icon>account_balance_wallet</mat-icon> Gestion des Caisses</h2>
+            <button mat-raised-button color="primary">
+              <mat-icon>add</mat-icon>
+              Nouvelle Caisse
+            </button>
+          </div>
+          
+          <!-- Cash Boxes Grid -->
+          <div class="cashbox-grid">
+            <mat-card class="cashbox-card" *ngFor="let cashBox of cashBoxes">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>account_balance_wallet</mat-icon>
+                  {{ cashBox.name }}
+                </mat-card-title>
+                <mat-card-subtitle>{{ cashBox.description || 'Aucune description' }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="cashbox-balance">
+                  <h3 [ngClass]="getBalanceColor(cashBox.currentBalance)">
+                    {{ formatCurrency(cashBox.currentBalance) }}
+                  </h3>
+                  <mat-chip [color]="cashBox.active ? 'primary' : 'basic'" selected>
+                    {{ cashBox.active ? 'Active' : 'Inactive' }}
+                  </mat-chip>
+                </div>
+                <div class="cashbox-actions">
+                  <button mat-button color="primary">
+                    <mat-icon>visibility</mat-icon>
+                    Détails
+                  </button>
+                  <button mat-button color="accent">
+                    <mat-icon>edit</mat-icon>
+                    Modifier
+                  </button>
+                  <button mat-button [color]="cashBox.active ? 'warn' : 'primary'">
+                    <mat-icon>{{ cashBox.active ? 'block' : 'check_circle' }}</mat-icon>
+                    {{ cashBox.active ? 'Désactiver' : 'Activer' }}
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          
+          <div *ngIf="cashBoxes.length === 0" class="no-data">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <p>Aucune caisse configurée</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Bank Accounts Tab -->
+    <mat-tab label="Comptes Bancaires">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <div class="tab-header">
+            <h2><mat-icon>account_balance</mat-icon> Gestion des Comptes Bancaires</h2>
+            <button mat-raised-button color="primary">
+              <mat-icon>add</mat-icon>
+              Nouveau Compte
+            </button>
+          </div>
+          
+          <!-- Bank Accounts Grid -->
+          <div class="bank-accounts-grid">
+            <mat-card class="bank-account-card" *ngFor="let account of bankAccounts">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>account_balance</mat-icon>
+                  {{ account.accountName }}
+                </mat-card-title>
+                <mat-card-subtitle>{{ account.bankName }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="account-info">
+                  <p><strong>Numéro:</strong> {{ account.accountNumber }}</p>
+                  <p><strong>Type:</strong> {{ account.accountType }}</p>
+                </div>
+                <div class="account-balance">
+                  <h3 [ngClass]="getBalanceColor(account.currentBalance)">
+                    {{ formatCurrency(account.currentBalance) }}
+                  </h3>
+                  <mat-chip [color]="account.active ? 'primary' : 'basic'" selected>
+                    {{ account.active ? 'Actif' : 'Inactif' }}
+                  </mat-chip>
+                </div>
+                <div class="account-actions">
+                  <button mat-button color="primary">
+                    <mat-icon>visibility</mat-icon>
+                    Détails
+                  </button>
+                  <button mat-button color="accent">
+                    <mat-icon>edit</mat-icon>
+                    Modifier
+                  </button>
+                  <button mat-button [color]="account.active ? 'warn' : 'primary'">
+                    <mat-icon>{{ account.active ? 'block' : 'check_circle' }}</mat-icon>
+                    {{ account.active ? 'Désactiver' : 'Activer' }}
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          
+          <div *ngIf="bankAccounts.length === 0" class="no-data">
+            <mat-icon>account_balance</mat-icon>
+            <p>Aucun compte bancaire configuré</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>

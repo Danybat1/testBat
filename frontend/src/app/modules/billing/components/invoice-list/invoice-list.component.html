@@ -1,0 +1,197 @@
+<div class="invoice-list-container">
+  <div class="header">
+    <div class="title-section">
+      <h1>Gestion des Factures</h1>
+      <p>Liste et gestion de toutes vos factures</p>
+    </div>
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" routerLink="/billing/invoices/new">
+        <mat-icon>add</mat-icon>
+        Nouvelle Facture
+      </button>
+      <button mat-stroked-button (click)="exportToExcel()">
+        <mat-icon>file_download</mat-icon>
+        Exporter Excel
+      </button>
+    </div>
+  </div>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="Numéro, client, description...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [formControl]="statusFilter">
+            <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select [formControl]="typeFilter">
+            <mat-option *ngFor="let type of typeOptions" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Effacer
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="invoice-table">
+          <!-- Invoice Number Column -->
+          <ng-container matColumnDef="invoiceNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>N° Facture</th>
+            <td mat-cell *matCellDef="let invoice">
+              <span class="invoice-number">{{ invoice.invoiceNumber }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Client Column -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let invoice">
+              <div class="client-info">
+                <span class="client-name">{{ invoice.client?.name || 'N/A' }}</span>
+                <span class="client-type">{{ invoice.type }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Invoice Date Column -->
+          <ng-container matColumnDef="invoiceDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Facture</th>
+            <td mat-cell *matCellDef="let invoice">
+              {{ formatDate(invoice.invoiceDate) }}
+            </td>
+          </ng-container>
+
+          <!-- Due Date Column -->
+          <ng-container matColumnDef="dueDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Échéance</th>
+            <td mat-cell *matCellDef="let invoice">
+              <span [class.overdue]="invoice.status === 'OVERDUE'">
+                {{ formatDate(invoice.dueDate) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Total Amount Column -->
+          <ng-container matColumnDef="totalAmount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant Total</th>
+            <td mat-cell *matCellDef="let invoice">
+              <span class="amount">{{ formatCurrency(invoice.totalAmount) }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Paid Amount Column -->
+          <ng-container matColumnDef="paidAmount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant Payé</th>
+            <td mat-cell *matCellDef="let invoice">
+              <span class="amount paid">{{ formatCurrency(invoice.paidAmount) }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Remaining Amount Column -->
+          <ng-container matColumnDef="remainingAmount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Reste à Payer</th>
+            <td mat-cell *matCellDef="let invoice">
+              <span class="amount remaining" [class.overdue]="invoice.status === 'OVERDUE'">
+                {{ formatCurrency(invoice.remainingAmount) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+            <td mat-cell *matCellDef="let invoice">
+              <mat-chip [color]="getStatusColor(invoice.status)" selected>
+                {{ getStatusLabel(invoice.status) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let invoice">
+              <button mat-icon-button [matMenuTriggerFor]="menu" class="action-button">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="viewInvoice(invoice)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Visualiser</span>
+                </button>
+                <button mat-menu-item (click)="editInvoice(invoice)" 
+                        [disabled]="invoice.status === 'PAID'">
+                  <mat-icon>edit</mat-icon>
+                  <span>Modifier</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="printInvoice(invoice)">
+                  <mat-icon>print</mat-icon>
+                  <span>Imprimer</span>
+                </button>
+                <button mat-menu-item (click)="generatePdf(invoice)">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  <span>Télécharger PDF</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteInvoice(invoice)" 
+                        [disabled]="invoice.status === 'PAID' || invoice.status === 'PARTIALLY_PAID'"
+                        class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  <span>Supprimer</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              [class.overdue-row]="row.status === 'OVERDUE'"
+              (click)="viewInvoice(row)"></tr>
+        </table>
+
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner></mat-spinner>
+          <p>Chargement des factures...</p>
+        </div>
+
+        <div *ngIf="!loading && dataSource.data.length === 0" class="no-data">
+          <mat-icon>receipt</mat-icon>
+          <h3>Aucune facture trouvée</h3>
+          <p>Commencez par créer votre première facture</p>
+          <button mat-raised-button color="primary" routerLink="/billing/invoices/new">
+            <mat-icon>add</mat-icon>
+            Créer une facture
+          </button>
+        </div>
+      </div>
+
+      <mat-paginator 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        showFirstLastButtons
+        aria-label="Sélectionner la page des factures">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

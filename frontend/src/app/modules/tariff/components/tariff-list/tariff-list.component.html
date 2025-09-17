@@ -1,0 +1,89 @@
+<div class="tariff-list-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="fas fa-dollar-sign"></i>
+      Gestion des Tarifs
+    </h2>
+    <button class="btn btn-primary" (click)="navigateToNewTariff()">
+      <i class="fas fa-plus"></i>
+      Nouveau Tarif
+    </button>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        placeholder="Rechercher un tarif..." 
+        [(ngModel)]="searchTerm"
+        class="search-input">
+    </div>
+  </div>
+
+
+  <div class="table-container" *ngIf="!loading">
+    <table class="tariffs-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Route</th>
+          <th>Taux/kg</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tariff of filteredTariffs; trackBy: trackByTariffId">
+          <td>{{ tariff.id }}</td>
+          <td>
+            <span class="route-info">
+              {{ tariff.originCity.name }} → {{ tariff.destinationCity.name }}
+            </span>
+          </td>
+          <td>{{ formatTariffRate(tariff.kgRate) | async }}</td>
+          <td>
+            <span class="status-badge" [class.active]="tariff.isActive" [class.inactive]="!tariff.isActive">
+              {{ tariff.isActive ? 'Actif' : 'Inactif' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button 
+              class="btn btn-sm btn-outline-info me-1" 
+              (click)="viewTariff(tariff.id!)"
+              title="Voir détails">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-primary me-1" 
+              (click)="editTariff(tariff.id!)"
+              title="Modifier">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-danger" 
+              (click)="deleteTariff(tariff.id!)"
+              title="Supprimer">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="no-results" *ngIf="filteredTariffs.length === 0 && tariffs.length > 0">
+      <i class="fas fa-search"></i>
+      <p>Aucun tarif ne correspond à votre recherche</p>
+    </div>
+
+    <div class="no-results" *ngIf="tariffs.length === 0">
+      <i class="fas fa-inbox"></i>
+      <p>Aucun tarif disponible</p>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Chargement des tarifs...</p>
+  </div>
+</div> 

@@ -1,0 +1,621 @@
+// E-TRANS Treasury Dashboard Styles
+@import '../../../../../scss/variables';
+
+.treasury-dashboard {
+  padding: 20px;
+  background: $primary-50;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .dashboard-header {
+    margin-bottom: 30px;
+    text-align: center;
+    
+    h1 {
+      color: $etrans-blue-primary;
+      font-weight: 300;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      color: #666;
+      font-size: 16px;
+    }
+  }
+
+  // Tabs Styling
+  .treasury-tabs {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    
+    ::ng-deep .mat-mdc-tab-header {
+      background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+      
+      .mat-mdc-tab {
+        color: rgba(255,255,255,0.7);
+        font-weight: 500;
+        
+        &.mdc-tab--active {
+          color: white;
+        }
+      }
+      
+      .mat-mdc-tab-header-pagination {
+        display: none;
+      }
+    }
+    
+    ::ng-deep .mat-mdc-tab-body-wrapper {
+      padding: 24px;
+    }
+  }
+
+  // Tab Content
+  .tab-content {
+    .tab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #e0e0e0;
+      
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: $etrans-blue-primary;
+        font-weight: 500;
+        margin: 0;
+        
+        mat-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+    }
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+
+    .stat-card {
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      }
+
+      &.primary {
+        background: linear-gradient(135deg, $etrans-blue-primary 0%, $etrans-blue-dark 100%);
+        color: white;
+      }
+
+      &.success {
+        background: linear-gradient(135deg, $success-500 0%, $success-600 100%);
+        color: white;
+      }
+
+      &.info {
+        background: linear-gradient(135deg, $etrans-blue-light 0%, $etrans-blue-primary 100%);
+        color: white;
+      }
+
+      &.warning {
+        background: linear-gradient(135deg, $warning-500 0%, $warning-600 100%);
+        color: white;
+      }
+
+      &.danger {
+        background: linear-gradient(135deg, $etrans-red-accent 0%, $secondary-700 100%);
+        color: white;
+      }
+
+      .stat-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        .stat-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          opacity: 0.9;
+        }
+
+        .stat-info {
+          flex: 1;
+
+          h3 {
+            margin: 0 0 4px 0;
+            font-size: 24px;
+            font-weight: 600;
+          }
+
+          p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+
+    .content-card {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      &.alert-card {
+        border-left: 4px solid $etrans-red-accent;
+        
+        .warning-icon {
+          color: $etrans-red-accent;
+        }
+      }
+
+      mat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 16px;
+
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0;
+          font-size: 18px;
+          font-weight: 500;
+        }
+
+        button {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 14px;
+        }
+      }
+
+      .list-container {
+        max-height: 300px;
+        overflow-y: auto;
+
+        .list-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid #f0f0f0;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &.alert {
+            background-color: #fff5f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #fed7d7;
+          }
+
+          .item-info {
+            flex: 1;
+
+            .transaction-header {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 4px;
+            }
+
+            h4 {
+              margin: 0 0 4px 0;
+              font-size: 16px;
+              font-weight: 500;
+              color: #333;
+            }
+
+            p {
+              margin: 0;
+              font-size: 14px;
+              color: #666;
+            }
+          }
+
+          .item-status {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+
+            .balance, .amount {
+              font-weight: 600;
+              font-size: 16px;
+
+              &.primary { color: $etrans-blue-primary; }
+              &.success { color: $success-500; }
+              &.warning { color: $warning-500; }
+              &.danger { color: $etrans-red-accent; }
+            }
+
+            mat-chip {
+              font-size: 12px;
+            }
+          }
+        }
+
+        .no-data {
+          text-align: center;
+          padding: 32px;
+          color: #999;
+          font-style: italic;
+        }
+      }
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px;
+    gap: 16px;
+
+    p {
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  // Filter Card
+  .filter-card {
+    margin-bottom: 24px;
+    border-radius: 12px;
+    
+    .filter-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+  }
+
+  // Transactions
+  .transactions-card {
+    border-radius: 12px;
+    
+    .transaction-item {
+      padding: 16px 0;
+      
+      &:last-child mat-divider {
+        display: none;
+      }
+    }
+    
+    .transaction-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .transaction-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba($etrans-blue-primary, 0.1);
+      
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+    
+    .transaction-details {
+      flex: 1;
+      
+      h4 {
+        margin: 0 0 4px 0;
+        font-weight: 500;
+        color: #333;
+      }
+      
+      p {
+        margin: 0 0 4px 0;
+        color: #666;
+        font-size: 14px;
+      }
+      
+      small {
+        color: #999;
+        font-size: 12px;
+      }
+    }
+    
+    .transaction-amount {
+      text-align: right;
+      
+      .amount {
+        display: block;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        
+        &.success {
+          color: #4caf50;
+        }
+        
+        &.warning {
+          color: #ff9800;
+        }
+      }
+    }
+  }
+
+  // Cash Boxes Grid
+  .cashbox-grid, .bank-accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+  }
+
+  .cashbox-card, .bank-account-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    mat-card-header {
+      padding: 20px 24px 16px;
+      
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #1976d2;
+        font-weight: 500;
+        
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+      
+      mat-card-subtitle {
+        color: #666;
+        margin-top: 4px;
+      }
+    }
+    
+    mat-card-content {
+      padding: 0 24px 20px;
+    }
+  }
+
+  .cashbox-balance, .account-balance {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    
+    h3 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      
+      &.primary {
+        color: $etrans-blue-primary;
+      }
+      
+      &.warn {
+        color: $etrans-red-accent;
+      }
+      
+      &.accent {
+        color: $warning-500;
+      }
+    }
+  }
+
+  .account-info {
+    margin-bottom: 16px;
+    
+    p {
+      margin: 8px 0;
+      color: #666;
+      
+      strong {
+        color: #333;
+      }
+    }
+  }
+
+  .cashbox-actions, .account-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    
+    button {
+      flex: 1;
+      min-width: 100px;
+    }
+  }
+
+  .quick-actions {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    
+    h2 {
+      color: $etrans-blue-primary;
+      font-weight: 500;
+      margin: 0 0 20px 0;
+      text-align: center;
+    }
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    
+    button {
+      padding: 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  // No Data
+  .no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .treasury-dashboard {
+    padding: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cashbox-grid, .bank-accounts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .transaction-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .transaction-amount {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .cashbox-actions, .account-actions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .content-card {
+    .list-container {
+      .list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+
+        .item-status {
+          align-items: flex-start;
+          flex-direction: row;
+          width: 100%;
+          justify-content: space-between;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-content {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .stat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .stat-info h3 {
+    font-size: 20px;
+  }
+  
+  .tab-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

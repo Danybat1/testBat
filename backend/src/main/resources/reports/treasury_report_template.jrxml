@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="treasury_report_template" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30">
+	<parameter name="reportTitle" class="java.lang.String"/>
+	<parameter name="reportPeriod" class="java.lang.String"/>
+	<parameter name="totalCashBalance" class="java.math.BigDecimal"/>
+	<parameter name="totalBankBalance" class="java.math.BigDecimal"/>
+	<parameter name="totalBalance" class="java.math.BigDecimal"/>
+	<parameter name="totalIncome" class="java.math.BigDecimal"/>
+	<parameter name="totalExpense" class="java.math.BigDecimal"/>
+	<parameter name="netFlow" class="java.math.BigDecimal"/>
+	<parameter name="companyName" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["EFRET SARL"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="companyAddress" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Kinshasa, République Démocratique du Congo"]]></defaultValueExpression>
+	</parameter>
+	<field name="reference" class="java.lang.String"/>
+	<field name="type" class="java.lang.String"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="transactionDate" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="category" class="java.lang.String"/>
+	<field name="accountName" class="java.lang.String"/>
+	<field name="accountType" class="java.lang.String"/>
+	<title>
+		<band height="120" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="535" height="80" backcolor="#F0F0F0"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="10" y="10" width="300" height="25" forecolor="#333333"/>
+				<textElement>
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{reportTitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="35" width="200" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="50" width="200" height="12"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{companyAddress}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="350" y="10" width="80" height="15"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Période:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="435" y="10" width="100" height="15"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{reportPeriod}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="90" width="100" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Résumé Financier]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="80" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="535" height="75" backcolor="#F8F9FA"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#E9ECEF"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="10" width="80" height="15"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Solde Caisses:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="95" y="10" width="100" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalCashBalance}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="200" y="10" width="20" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[XAF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="10" width="80" height="15"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Solde Banques:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="365" y="10" width="100" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalBankBalance}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="470" y="10" width="20" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[XAF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="30" width="80" height="15"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Recettes:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="95" y="30" width="100" height="15"/>
+				<textElement>
+					<font size="10" forecolor="#4CAF50"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalIncome}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="200" y="30" width="20" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[XAF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="30" width="80" height="15"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Dépenses:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="365" y="30" width="100" height="15"/>
+				<textElement>
+					<font size="10" forecolor="#F44336"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalExpense}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="470" y="30" width="20" height="15"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[XAF]]></text>
+			</staticText>
+			<line>
+				<reportElement x="10" y="50" width="515" height="1" forecolor="#CCCCCC"/>
+			</line>
+			<staticText>
+				<reportElement x="10" y="55" width="80" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SOLDE TOTAL:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="95" y="55" width="100" height="15"/>
+				<textElement>
+					<font size="12" isBold="true" forecolor="#1976D2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalBalance}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="200" y="55" width="20" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[XAF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="55" width="80" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FLUX NET:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="365" y="55" width="100" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{netFlow}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="470" y="55" width="20" height="15"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[XAF]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="535" height="25" backcolor="#E0E0E0"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="5" y="5" width="80" height="15"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Référence]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="90" y="5" width="50" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="145" y="5" width="60" height="15"/>
+				<textElement textAlignment="Right">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Montant]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="5" width="60" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="275" y="5" width="120" height="15"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="5" width="60" height="15"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Catégorie]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="465" y="5" width="65" height="15"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Compte]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement x="5" y="2" width="80" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reference}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="2" width="50" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="145" y="2" width="60" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="210" y="2" width="60" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transactionDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="275" y="2" width="120" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="2" width="60" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{category} != null ? $F{category} : "-"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="465" y="2" width="65" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{accountName}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="16" width="535" height="1" forecolor="#F0F0F0"/>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="10" width="400" height="15"/>
+				<textElement>
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Rapport généré automatiquement par le système EFRET - Trésorerie]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="450" y="10" width="85" height="15"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

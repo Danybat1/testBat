@@ -1,0 +1,354 @@
+// Variables
+:root {
+  --primary-color: #2563eb;
+  --secondary-color: #64748b;
+  --success-color: #059669;
+  --warning-color: #d97706;
+  --danger-color: #dc2626;
+  --info-color: #0891b2;
+  --light-color: #f8fafc;
+  --dark-color: #1e293b;
+  --border-color: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --border-radius: 0.5rem;
+  --transition: all 0.3s ease;
+}
+
+// Base styles
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+// Header
+.header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
+  color: white;
+  padding: 1.5rem 0;
+  box-shadow: var(--shadow);
+
+  &-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
+
+.logo-section {
+  .app-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 2.5rem;
+    }
+  }
+
+  .app-subtitle {
+    margin: 0.25rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.875rem;
+  }
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 1.5rem;
+    }
+
+    .username {
+      font-weight: 600;
+    }
+
+    .user-roles {
+      display: flex;
+      gap: 0.25rem;
+      margin-left: 0.5rem;
+    }
+
+    .role-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.125rem 0.5rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+  }
+
+  .logout-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+// Main content
+.main-content {
+  min-height: calc(100vh - 200px);
+  padding: 2rem 0;
+}
+
+// Welcome section
+.welcome-section {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  .welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+  }
+
+  .welcome-description {
+    font-size: 1.125rem;
+    color: var(--secondary-color);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+// Modules section
+.modules-section {
+  margin-bottom: 3rem;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.module-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+
+  &:hover:not(&--disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f9fafb;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  &__icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  &__access {
+    color: var(--secondary-color);
+    font-size: 1.25rem;
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0 0 0.5rem 0;
+  }
+
+  &__description {
+    color: var(--secondary-color);
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+  }
+
+  &__footer {
+    .required-role {
+      font-size: 0.75rem;
+      color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+  }
+
+  &__arrow {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: var(--secondary-color);
+    font-size: 1.25rem;
+    opacity: 0;
+    transition: var(--transition);
+  }
+
+  &:hover &__arrow {
+    opacity: 1;
+    transform: translateX(0.25rem);
+  }
+
+  // Color variants
+  &--blue &__icon {
+    background: var(--primary-color);
+  }
+
+  &--green &__icon {
+    background: var(--success-color);
+  }
+
+  &--purple &__icon {
+    background: #7c3aed;
+  }
+
+  &--orange &__icon {
+    background: var(--warning-color);
+  }
+
+  &--red &__icon {
+    background: var(--danger-color);
+  }
+
+  &--gray &__icon {
+    background: var(--secondary-color);
+  }
+}
+
+// Stats section
+.stats-section {
+  margin-bottom: 2rem;
+
+  .stats-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  &__icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--light-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    margin-top: 0.25rem;
+  }
+}
+
+// Footer
+.footer {
+  background: var(--light-color);
+  border-top: 1px solid var(--border-color);
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--secondary-color);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .welcome-title {
+    font-size: 2rem;
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

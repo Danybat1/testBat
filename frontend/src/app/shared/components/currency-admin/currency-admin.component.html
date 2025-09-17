@@ -1,0 +1,259 @@
+<div class="currency-admin">
+  <div class="container-fluid">
+    
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">
+            <i class="fas fa-cogs me-2"></i>
+            Administration des Devises
+          </h2>
+          <button 
+            class="btn btn-outline-primary" 
+            (click)="refreshData()"
+            [disabled]="isLoading">
+            <i class="fas fa-sync-alt me-2" [class.fa-spin]="isLoading"></i>
+            Actualiser
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message d'alerte -->
+    <div class="row mb-3" *ngIf="message">
+      <div class="col-12">
+        <div [class]="getMessageClass()" role="alert">
+          <i class="fas fa-info-circle me-2"></i>
+          {{ message }}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      
+      <!-- Formulaire de mise à jour des taux -->
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-edit me-2"></i>
+              Mettre à jour un taux de change
+            </h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="updateForm" (ngSubmit)="updateExchangeRate()">
+              
+              <!-- Devise source -->
+              <div class="mb-3">
+                <label for="fromCurrency" class="form-label">Devise source</label>
+                <select 
+                  id="fromCurrency" 
+                  class="form-select" 
+                  formControlName="fromCurrency">
+                  <option value="">Sélectionner une devise</option>
+                  <option 
+                    *ngFor="let currency of currencies" 
+                    [value]="currency.code">
+                    {{ currency.code }} - {{ currency.name }}
+                  </option>
+                </select>
+                <div 
+                  class="invalid-feedback" 
+                  *ngIf="updateForm.get('fromCurrency')?.invalid && updateForm.get('fromCurrency')?.touched">
+                  Veuillez sélectionner une devise source
+                </div>
+              </div>
+
+              <!-- Devise cible -->
+              <div class="mb-3">
+                <label for="toCurrency" class="form-label">Devise cible</label>
+                <select 
+                  id="toCurrency" 
+                  class="form-select" 
+                  formControlName="toCurrency">
+                  <option value="">Sélectionner une devise</option>
+                  <option 
+                    *ngFor="let currency of currencies" 
+                    [value]="currency.code">
+                    {{ currency.code }} - {{ currency.name }}
+                  </option>
+                </select>
+                <div 
+                  class="invalid-feedback" 
+                  *ngIf="updateForm.get('toCurrency')?.invalid && updateForm.get('toCurrency')?.touched">
+                  Veuillez sélectionner une devise cible
+                </div>
+              </div>
+
+              <!-- Taux de change -->
+              <div class="mb-3">
+                <label for="rate" class="form-label">Taux de change</label>
+                <div class="input-group">
+                  <input 
+                    type="number" 
+                    id="rate" 
+                    class="form-control" 
+                    formControlName="rate"
+                    step="0.000001"
+                    min="0.000001"
+                    placeholder="Ex: 2700.00">
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-secondary"
+                    (click)="useSuggestedRate()"
+                    [disabled]="!calculateSuggestedRate()"
+                    title="Utiliser le taux inverse suggéré">
+                    <i class="fas fa-magic"></i>
+                  </button>
+                </div>
+                <div class="form-text" *ngIf="calculateSuggestedRate()">
+                  Taux suggéré (inverse): {{ formatRate(calculateSuggestedRate()!) }}
+                </div>
+                <div 
+                  class="invalid-feedback" 
+                  *ngIf="updateForm.get('rate')?.invalid && updateForm.get('rate')?.touched">
+                  Veuillez saisir un taux valide (> 0.000001)
+                </div>
+              </div>
+
+              <!-- Boutons -->
+              <div class="d-grid gap-2">
+                <button 
+                  type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="updateForm.invalid || isLoading">
+                  <i class="fas fa-save me-2"></i>
+                  {{ rateExists(updateForm.value.fromCurrency, updateForm.value.toCurrency) ? 'Mettre à jour' : 'Créer' }}
+                </button>
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary"
+                  (click)="updateForm.reset()">
+                  <i class="fas fa-times me-2"></i>
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des taux actuels -->
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-list me-2"></i>
+              Taux de change actuels
+            </h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="isLoading" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+              </div>
+            </div>
+            
+            <div *ngIf="!isLoading && exchangeRates.length === 0" class="text-center py-4 text-muted">
+              <i class="fas fa-info-circle fa-2x mb-3"></i>
+              <p>Aucun taux de change configuré</p>
+            </div>
+
+            <div *ngIf="!isLoading && exchangeRates.length > 0" class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Paire</th>
+                    <th>Taux</th>
+                    <th>Inverse</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let rate of exchangeRates">
+                    <td>
+                      <strong>{{ rate.fromCurrency.code }}/{{ rate.toCurrency.code }}</strong>
+                      <br>
+                      <small class="text-muted">
+                        {{ rate.fromCurrency.symbol }} → {{ rate.toCurrency.symbol }}
+                      </small>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">
+                        {{ formatRate(rate.rate) }}
+                      </span>
+                    </td>
+                    <td>
+                      <small class="text-muted">
+                        {{ getInverseRate(rate) }}
+                      </small>
+                    </td>
+                    <td>
+                      <button 
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="editRate(rate)"
+                        title="Modifier ce taux">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations sur les devises -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-coins me-2"></i>
+              Devises disponibles
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div 
+                *ngFor="let currency of currencies" 
+                class="col-md-6 col-lg-4 mb-3">
+                <div class="card border-0 bg-light">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center">
+                      <div class="currency-symbol me-3">
+                        <span class="badge bg-secondary fs-6">
+                          {{ currency.symbol }}
+                        </span>
+                      </div>
+                      <div>
+                        <h6 class="mb-1">
+                          {{ currency.code }}
+                          <span 
+                            *ngIf="currency.isDefault" 
+                            class="badge bg-warning ms-2"
+                            title="Devise par défaut">
+                            Défaut
+                          </span>
+                        </h6>
+                        <small class="text-muted">{{ currency.name }}</small>
+                        <br>
+                        <small class="text-muted">
+                          {{ currency.decimalPlaces }} décimales
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

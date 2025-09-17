@@ -1,0 +1,85 @@
+.card {
+  border: none;
+  border-radius: 10px;
+}
+
+.card-header {
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.invalid-feedback {
+  font-size: 0.875rem;
+}
+
+.form-text {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .d-flex.justify-content-end {
+    flex-direction: column;
+  }
+}

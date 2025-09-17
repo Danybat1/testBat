@@ -1,0 +1,223 @@
+<div class="general-ledger-container">
+  <!-- Vue liste des comptes -->
+  <div *ngIf="!selectedAccount" class="accounts-list-view">
+    <div class="header-section">
+      <h2>Grand Livre</h2>
+      <div class="actions">
+        <button mat-raised-button (click)="exportLedger()">
+          <mat-icon>file_download</mat-icon>
+          Exporter tout
+        </button>
+      </div>
+    </div>
+
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher un compte</mat-label>
+        <input matInput [(ngModel)]="searchTerm" placeholder="Code ou nom du compte">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="accounts-grid" *ngIf="!loading">
+      <mat-card *ngFor="let account of accounts" 
+                class="account-card" 
+                [ngClass]="'account-type-' + account.accountType.toLowerCase()"
+                (click)="selectAccount(account)">
+        <mat-card-header>
+          <div class="account-header">
+            <span class="account-code">{{ account.accountCode }}</span>
+            <mat-chip class="type-chip" [ngClass]="'type-' + account.accountType.toLowerCase()">
+              {{ account.accountType }}
+            </mat-chip>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <h3>{{ account.accountName }}</h3>
+          <div class="account-summary">
+            <div class="balance-info">
+              <div class="balance-item">
+                <span class="label">Solde d'ouverture:</span>
+                <span class="amount">{{ account.openingBalance | currency:'XOF':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="balance-item">
+                <span class="label">Total débits:</span>
+                <span class="amount debit">{{ account.totalDebits | currency:'XOF':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="balance-item">
+                <span class="label">Total crédits:</span>
+                <span class="amount credit">{{ account.totalCredits | currency:'XOF':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="balance-item final">
+                <span class="label">Solde de clôture:</span>
+                <span class="amount" [ngClass]="{'positive': account.closingBalance > 0, 'negative': account.closingBalance < 0}">
+                  {{ account.closingBalance | currency:'XOF':'symbol':'1.0-0' }}
+                </span>
+              </div>
+            </div>
+            <div class="entries-count">
+              <mat-icon>receipt</mat-icon>
+              <span>{{ account.entries.length }} écritures</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner></mat-spinner>
+      <p>Chargement des comptes...</p>
+    </div>
+  </div>
+
+  <!-- Vue détail d'un compte -->
+  <div *ngIf="selectedAccount" class="account-detail-view">
+    <div class="header-section">
+      <div class="account-info">
+        <button mat-icon-button (click)="goBackToAccounts()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="account-title">
+          <h2>{{ selectedAccount.accountCode }} - {{ selectedAccount.accountName }}</h2>
+          <mat-chip class="type-chip" [ngClass]="'type-' + selectedAccount.accountType.toLowerCase()">
+            {{ selectedAccount.accountType }}
+          </mat-chip>
+        </div>
+      </div>
+      <div class="actions">
+        <button mat-raised-button (click)="exportLedger()">
+          <mat-icon>file_download</mat-icon>
+          Exporter
+        </button>
+        <button mat-raised-button (click)="printLedger()">
+          <mat-icon>print</mat-icon>
+          Imprimer
+        </button>
+      </div>
+    </div>
+
+    <div class="filters-section">
+      <mat-form-field appearance="outline">
+        <mat-label>Date de début</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="dateFrom">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="dateTo">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" (click)="applyDateFilter()">
+        <mat-icon>filter_list</mat-icon>
+        Filtrer
+      </button>
+
+      <button mat-button (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Effacer
+      </button>
+    </div>
+
+    <div class="account-summary-cards">
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <div class="summary-item">
+            <span class="label">Solde d'ouverture</span>
+            <span class="value">{{ selectedAccount.openingBalance | currency:'XOF':'symbol':'1.0-0' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card debit">
+        <mat-card-content>
+          <div class="summary-item">
+            <span class="label">Total débits</span>
+            <span class="value">{{ selectedAccount.totalDebits | currency:'XOF':'symbol':'1.0-0' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card credit">
+        <mat-card-content>
+          <div class="summary-item">
+            <span class="label">Total crédits</span>
+            <span class="value">{{ selectedAccount.totalCredits | currency:'XOF':'symbol':'1.0-0' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card balance">
+        <mat-card-content>
+          <div class="summary-item">
+            <span class="label">Solde de clôture</span>
+            <span class="value" [ngClass]="{'positive': selectedAccount.closingBalance > 0, 'negative': selectedAccount.closingBalance < 0}">
+              {{ selectedAccount.closingBalance | currency:'XOF':'symbol':'1.0-0' }}
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="entries-table">
+      <table mat-table [dataSource]="selectedAccount.entries" class="ledger-table">
+        
+        <!-- Date -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let entry">{{ entry.date | date:'dd/MM/yyyy' }}</td>
+        </ng-container>
+
+        <!-- Référence -->
+        <ng-container matColumnDef="reference">
+          <th mat-header-cell *matHeaderCellDef>Référence</th>
+          <td mat-cell *matCellDef="let entry">
+            <span class="reference-link">{{ entry.reference }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Description -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
+          <td mat-cell *matCellDef="let entry">{{ entry.description }}</td>
+        </ng-container>
+
+        <!-- Débit -->
+        <ng-container matColumnDef="debit">
+          <th mat-header-cell *matHeaderCellDef class="amount-column">Débit</th>
+          <td mat-cell *matCellDef="let entry" class="amount-column">
+            <span *ngIf="entry.debitAmount > 0" class="debit-amount">
+              {{ entry.debitAmount | currency:'XOF':'symbol':'1.0-0' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Crédit -->
+        <ng-container matColumnDef="credit">
+          <th mat-header-cell *matHeaderCellDef class="amount-column">Crédit</th>
+          <td mat-cell *matCellDef="let entry" class="amount-column">
+            <span *ngIf="entry.creditAmount > 0" class="credit-amount">
+              {{ entry.creditAmount | currency:'XOF':'symbol':'1.0-0' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Solde -->
+        <ng-container matColumnDef="balance">
+          <th mat-header-cell *matHeaderCellDef class="amount-column">Solde</th>
+          <td mat-cell *matCellDef="let entry" class="amount-column">
+            <span class="balance-amount" [ngClass]="{'positive': entry.balance > 0, 'negative': entry.balance < 0}">
+              {{ entry.balance | currency:'XOF':'symbol':'1.0-0' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="entry-row"></tr>
+      </table>
+    </div>
+  </div>
+</div>

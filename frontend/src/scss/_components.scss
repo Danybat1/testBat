@@ -1,0 +1,648 @@
+// FreightOps Component Styles - Responsive & Modern
+
+// Import layout, typography, accessibility, utilities, dark theme, and client autocomplete
+@import 'layout';
+@import 'typography';
+@import 'accessibility';
+@import 'utilities';
+@import 'dark-theme';
+@import 'client-autocomplete';
+
+// Navigation Components
+.navbar-brand {
+  font-weight: $font-weight-bold;
+  font-size: 1.25rem;
+  color: $primary-600;
+  
+  @include mobile-only {
+    font-size: 1.125rem;
+  }
+}
+
+.navbar-nav {
+  .nav-link {
+    font-weight: $font-weight-medium;
+    padding: 0.5rem 1rem;
+    border-radius: $border-radius;
+    transition: $transition-base;
+    
+    &:hover {
+      background: rgba($primary-500, 0.1);
+      color: $primary-600;
+    }
+    
+    &.active {
+      background: $primary-500;
+      color: white;
+    }
+  }
+}
+
+// Sidebar Navigation
+.sidebar {
+  width: $sidebar-width;
+  background: white;
+  box-shadow: $box-shadow-lg;
+  transition: $transition-base;
+  
+  @include mobile-tablet {
+    position: fixed;
+    top: 0;
+    left: -$sidebar-width;
+    height: 100vh;
+    z-index: $zindex-fixed;
+    
+    &.show {
+      left: 0;
+    }
+  }
+  
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+    
+    .nav-link-text {
+      display: none;
+    }
+  }
+  
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: $neutral-600;
+    border-radius: $border-radius;
+    margin: 0.25rem 0.5rem;
+    transition: $transition-base;
+    
+    @include mobile-only {
+      padding: 1rem;
+      margin: 0.25rem;
+    }
+    
+    &:hover {
+      background: $primary-50;
+      color: $primary-600;
+      transform: translateX(4px);
+    }
+    
+    &.active {
+      @include gradient-primary;
+      color: white;
+      box-shadow: $box-shadow;
+    }
+    
+    .nav-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Main Content Layout
+.main-content {
+  margin-left: $sidebar-width;
+  transition: $transition-base;
+  min-height: 100vh;
+  
+  @include mobile-tablet {
+    margin-left: 0;
+  }
+  
+  &.sidebar-collapsed {
+    margin-left: $sidebar-collapsed-width;
+    
+    @include mobile-tablet {
+      margin-left: 0;
+    }
+  }
+}
+
+.page-header {
+  @include flex-between;
+  margin-bottom: 2rem;
+  padding: 1rem 0;
+  
+  @include mobile-only {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .page-title {
+    font-size: $h2-font-size;
+    font-weight: $font-weight-semibold;
+    color: $neutral-800;
+    margin: 0;
+    
+    @include mobile-only {
+      font-size: $h3-font-size;
+    }
+  }
+  
+  .page-actions {
+    display: flex;
+    gap: 0.75rem;
+    
+    @include mobile-only {
+      width: 100%;
+      
+      .btn {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// Card Components
+.card {
+  @include card-style;
+  
+  .card-header {
+    background: $neutral-50;
+    border-bottom: 1px solid $neutral-200;
+    padding: 1rem 1.5rem;
+    
+    @include mobile-only {
+      padding: 0.75rem 1rem;
+    }
+    
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: $font-weight-semibold;
+      color: $neutral-800;
+      margin: 0;
+      
+      @include mobile-only {
+        font-size: 1rem;
+      }
+    }
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+    
+    @include mobile-only {
+      padding: 1rem;
+    }
+  }
+  
+  .card-footer {
+    background: $neutral-50;
+    border-top: 1px solid $neutral-200;
+    padding: 1rem 1.5rem;
+    
+    @include mobile-only {
+      padding: 0.75rem 1rem;
+    }
+  }
+}
+
+// Form Components
+.form-group {
+  margin-bottom: 1.5rem;
+  
+  @include mobile-only {
+    margin-bottom: 1rem;
+  }
+}
+
+.form-label {
+  font-weight: $font-weight-medium;
+  color: $neutral-700;
+  margin-bottom: 0.5rem;
+  display: block;
+  
+  &.required::after {
+    content: ' *';
+    color: $danger-500;
+  }
+}
+
+.form-control {
+  @include form-control-style;
+  
+  @include mobile-only {
+    padding: 0.625rem 0.75rem;
+  }
+}
+
+.form-select {
+  @include form-control-style;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+.input-group {
+  display: flex;
+  width: 100%;
+  
+  .input-group-text {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: $neutral-100;
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius 0 0 $input-border-radius;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $neutral-600;
+    
+    @include mobile-only {
+      padding: 0.625rem 0.5rem;
+      font-size: $font-size-sm;
+    }
+  }
+  
+  .form-control {
+    border-radius: 0 $input-border-radius $input-border-radius 0;
+    border-left: none;
+    
+    &:focus {
+      border-left: $input-border-width solid $input-focus-border-color;
+    }
+  }
+}
+
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: $font-size-sm;
+  color: $danger-500;
+}
+
+.valid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: $font-size-sm;
+  color: $success-500;
+}
+
+// Button Components
+.btn {
+  @include button-style($primary-500);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: $font-size-base;
+  text-decoration: none;
+  
+  @include mobile-only {
+    padding: 0.625rem 1rem;
+    font-size: $font-size-sm;
+  }
+  
+  &.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: $font-size-sm;
+    
+    @include mobile-only {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+  
+  &.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: $font-size-lg;
+    
+    @include mobile-only {
+      padding: 0.625rem 1.25rem;
+      font-size: $font-size-base;
+    }
+  }
+  
+  &.btn-primary {
+    @include gradient-primary;
+  }
+  
+  &.btn-secondary {
+    @include gradient-secondary;
+  }
+  
+  &.btn-success {
+    @include gradient-success;
+  }
+  
+  &.btn-warning {
+    @include gradient-warning;
+  }
+  
+  &.btn-danger {
+    @include gradient-danger;
+  }
+  
+  &.btn-outline-primary {
+    background: transparent;
+    border: 2px solid $primary-500;
+    color: $primary-500;
+    
+    &:hover {
+      @include gradient-primary;
+      color: white;
+    }
+  }
+  
+  &.btn-outline-secondary {
+    background: transparent;
+    border: 2px solid $secondary-500;
+    color: $secondary-500;
+    
+    &:hover {
+      @include gradient-secondary;
+      color: white;
+    }
+  }
+}
+
+// Table Components
+.table-responsive {
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  
+  @include mobile-only {
+    border-radius: $border-radius;
+    margin: 0 -1rem;
+    
+    .table {
+      margin-bottom: 0;
+      
+      th, td {
+        padding: 0.5rem;
+        font-size: $font-size-sm;
+      }
+    }
+  }
+}
+
+.table {
+  margin-bottom: 0;
+  
+  thead th {
+    background: $neutral-50;
+    border-bottom: 2px solid $neutral-200;
+    font-weight: $font-weight-semibold;
+    color: $neutral-700;
+    padding: 1rem 0.75rem;
+    
+    @include mobile-only {
+      padding: 0.75rem 0.5rem;
+      font-size: $font-size-sm;
+    }
+  }
+  
+  tbody {
+    tr {
+      transition: $transition-base;
+      
+      &:hover {
+        background: $primary-50;
+      }
+      
+      td {
+        padding: 0.75rem;
+        border-top: 1px solid $neutral-200;
+        vertical-align: middle;
+        
+        @include mobile-only {
+          padding: 0.5rem;
+          font-size: $font-size-sm;
+        }
+      }
+    }
+  }
+}
+
+// Badge Components
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $badge-padding-y $badge-padding-x;
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
+  border-radius: $badge-border-radius;
+  
+  @include mobile-only {
+    font-size: 0.6875rem;
+    padding: 0.1875rem 0.375rem;
+  }
+  
+  &.bg-primary {
+    @include gradient-primary;
+    color: white;
+  }
+  
+  &.bg-secondary {
+    @include gradient-secondary;
+    color: white;
+  }
+  
+  &.bg-success {
+    @include gradient-success;
+    color: white;
+  }
+  
+  &.bg-warning {
+    @include gradient-warning;
+    color: white;
+  }
+  
+  &.bg-danger {
+    @include gradient-danger;
+    color: white;
+  }
+}
+
+// Alert Components
+.alert {
+  border: none;
+  border-radius: $alert-border-radius;
+  padding: $alert-padding-y $alert-padding-x;
+  margin-bottom: $alert-margin-bottom;
+  
+  @include mobile-only {
+    padding: 0.75rem;
+    margin: 0 -1rem 1rem -1rem;
+    border-radius: 0;
+  }
+  
+  &.alert-primary {
+    background: rgba($primary-500, 0.1);
+    color: $primary-700;
+    border-left: 4px solid $primary-500;
+  }
+  
+  &.alert-secondary {
+    background: rgba($secondary-500, 0.1);
+    color: $secondary-700;
+    border-left: 4px solid $secondary-500;
+  }
+  
+  &.alert-success {
+    background: rgba($success-500, 0.1);
+    color: $success-700;
+    border-left: 4px solid $success-500;
+  }
+  
+  &.alert-warning {
+    background: rgba($warning-500, 0.1);
+    color: $warning-700;
+    border-left: 4px solid $warning-500;
+  }
+  
+  &.alert-danger {
+    background: rgba($danger-500, 0.1);
+    color: $danger-700;
+    border-left: 4px solid $danger-500;
+  }
+}
+
+// Modal Components
+.modal {
+  .modal-dialog {
+    @include mobile-only {
+      margin: 0.5rem;
+      max-width: none;
+    }
+  }
+  
+  .modal-content {
+    border: none;
+    border-radius: $border-radius-xl;
+    box-shadow: $box-shadow-xl;
+    
+    @include mobile-only {
+      border-radius: $border-radius-lg;
+    }
+  }
+  
+  .modal-header {
+    @include gradient-primary;
+    color: white;
+    border-bottom: none;
+    border-radius: $border-radius-xl $border-radius-xl 0 0;
+    padding: 1.5rem;
+    
+    @include mobile-only {
+      padding: 1rem;
+      border-radius: $border-radius-lg $border-radius-lg 0 0;
+    }
+    
+    .modal-title {
+      font-weight: $font-weight-semibold;
+    }
+    
+    .btn-close {
+      filter: invert(1);
+      opacity: 0.8;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+    
+    @include mobile-only {
+      padding: 1rem;
+    }
+  }
+  
+  .modal-footer {
+    border-top: 1px solid $neutral-200;
+    padding: 1rem 1.5rem;
+    
+    @include mobile-only {
+      padding: 1rem;
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Loading States
+.loading-spinner {
+  @include flex-center;
+  padding: 2rem;
+  
+  .spinner-border {
+    width: 2rem;
+    height: 2rem;
+    border-width: 0.25em;
+    border-color: $primary-500;
+    border-right-color: transparent;
+  }
+}
+
+.skeleton-loader {
+  @include loading-skeleton;
+  
+  &.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+    
+    &:last-child {
+      width: 60%;
+    }
+  }
+  
+  &.skeleton-title {
+    height: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  &.skeleton-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+  }
+}
+
+// Status Indicators
+.status-active {
+  @include status-badge($success-500);
+}
+
+.status-inactive {
+  @include status-badge($neutral-400);
+}
+
+.status-pending {
+  @include status-badge($warning-500);
+}
+
+.status-error {
+  @include status-badge($danger-500);
+}
+
+// Responsive utilities
+.mobile-hidden {
+  @include mobile-only {
+    display: none !important;
+  }
+}
+
+.desktop-hidden {
+  @include desktop-only {
+    display: none !important;
+  }
+}
+
+.mobile-full-width {
+  @include mobile-only {
+    width: 100% !important;
+  }
+}

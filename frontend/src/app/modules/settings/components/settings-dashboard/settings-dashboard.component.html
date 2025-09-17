@@ -1,0 +1,198 @@
+<div class="settings-dashboard-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-gear"></i>
+      Paramètres de l'Application
+    </h2>
+  </div>
+
+  <div class="settings-content" *ngIf="!loading">
+    <form [formGroup]="settingsForm" (ngSubmit)="onSave()" class="settings-form">
+      
+      <!-- Company Information Section -->
+      <div class="settings-section">
+        <h3 class="section-title">
+          <i class="bi bi-building"></i>
+          Informations de l'entreprise
+        </h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="companyName" class="form-label">Nom de l'entreprise *</label>
+            <input
+              type="text"
+              id="companyName"
+              formControlName="companyName"
+              class="form-control"
+              [class.is-invalid]="settingsForm.get('companyName')?.invalid && settingsForm.get('companyName')?.touched">
+            <div class="invalid-feedback" *ngIf="getFieldError('companyName')">
+              {{ getFieldError('companyName') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="companyEmail" class="form-label">Email de l'entreprise *</label>
+            <input
+              type="email"
+              id="companyEmail"
+              formControlName="companyEmail"
+              class="form-control"
+              [class.is-invalid]="settingsForm.get('companyEmail')?.invalid && settingsForm.get('companyEmail')?.touched">
+            <div class="invalid-feedback" *ngIf="getFieldError('companyEmail')">
+              {{ getFieldError('companyEmail') }}
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="companyAddress" class="form-label">Adresse de l'entreprise *</label>
+            <textarea
+              id="companyAddress"
+              formControlName="companyAddress"
+              class="form-control"
+              rows="3"
+              [class.is-invalid]="settingsForm.get('companyAddress')?.invalid && settingsForm.get('companyAddress')?.touched"></textarea>
+            <div class="invalid-feedback" *ngIf="getFieldError('companyAddress')">
+              {{ getFieldError('companyAddress') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="companyPhone" class="form-label">Téléphone de l'entreprise *</label>
+            <input
+              type="tel"
+              id="companyPhone"
+              formControlName="companyPhone"
+              class="form-control"
+              [class.is-invalid]="settingsForm.get('companyPhone')?.invalid && settingsForm.get('companyPhone')?.touched">
+            <div class="invalid-feedback" *ngIf="getFieldError('companyPhone')">
+              {{ getFieldError('companyPhone') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Application Settings Section -->
+      <div class="settings-section">
+        <h3 class="section-title">
+          <i class="bi bi-sliders"></i>
+          Paramètres de l'application
+        </h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="defaultCurrency" class="form-label">Devise par défaut *</label>
+            <select
+              id="defaultCurrency"
+              formControlName="defaultCurrency"
+              class="form-control">
+              <option *ngFor="let currency of currencies" [value]="currency">
+                {{ currency }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="timeZone" class="form-label">Fuseau horaire *</label>
+            <select
+              id="timeZone"
+              formControlName="timeZone"
+              class="form-control">
+              <option *ngFor="let tz of timeZones" [value]="tz">
+                {{ tz }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="language" class="form-label">Langue *</label>
+            <select
+              id="language"
+              formControlName="language"
+              class="form-control">
+              <option *ngFor="let lang of languages" [value]="lang.code">
+                {{ lang.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Section -->
+      <div class="settings-section">
+        <h3 class="section-title">
+          <i class="bi bi-bell"></i>
+          Notifications
+        </h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                id="emailNotifications"
+                formControlName="emailNotifications"
+                class="form-check-input">
+              <label for="emailNotifications" class="form-check-label">
+                <i class="bi bi-envelope"></i>
+                Notifications par email
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                id="smsNotifications"
+                formControlName="smsNotifications"
+                class="form-check-input">
+              <label for="smsNotifications" class="form-check-label">
+                <i class="bi bi-phone"></i>
+                Notifications par SMS
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-check">
+              <input
+                type="checkbox"
+                id="autoBackup"
+                formControlName="autoBackup"
+                class="form-check-input">
+              <label for="autoBackup" class="form-check-label">
+                <i class="bi bi-cloud-arrow-up"></i>
+                Sauvegarde automatique
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onReset()"
+          [disabled]="saving">
+          <i class="bi bi-arrow-clockwise"></i>
+          Réinitialiser
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="settingsForm.invalid || saving">
+          <i class="bi bi-check-circle" *ngIf="!saving"></i>
+          <i class="bi bi-arrow-clockwise spin" *ngIf="saving"></i>
+          {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Chargement des paramètres...</p>
+  </div>
+</div>

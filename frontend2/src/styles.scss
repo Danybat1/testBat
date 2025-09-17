@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Global Material Design overrides */
+.mat-mdc-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 12px !important;
+}
+
+.mat-mdc-raised-button {
+  border-radius: 8px !important;
+}
+
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    border-radius: 8px !important;
+  }
+}

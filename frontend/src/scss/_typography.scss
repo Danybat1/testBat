@@ -1,0 +1,421 @@
+// FreightOps Typography System - Professional & Accessible
+
+// Base Typography
+body {
+  font-family: $font-family-sans-serif;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-base;
+  color: $neutral-700;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Heading Hierarchy
+h1, .h1 {
+  font-size: $h1-font-size;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  color: $neutral-800;
+  margin-bottom: 1rem;
+  
+  @include mobile-only {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+h2, .h2 {
+  font-size: $h2-font-size;
+  font-weight: $font-weight-semibold;
+  line-height: 1.25;
+  color: $neutral-800;
+  margin-bottom: 0.875rem;
+  
+  @include mobile-only {
+    font-size: 1.5rem;
+    margin-bottom: 0.625rem;
+  }
+}
+
+h3, .h3 {
+  font-size: $h3-font-size;
+  font-weight: $font-weight-semibold;
+  line-height: 1.3;
+  color: $neutral-700;
+  margin-bottom: 0.75rem;
+  
+  @include mobile-only {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+h4, .h4 {
+  font-size: $h4-font-size;
+  font-weight: $font-weight-medium;
+  line-height: 1.35;
+  color: $neutral-700;
+  margin-bottom: 0.625rem;
+  
+  @include mobile-only {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+h5, .h5 {
+  font-size: $h5-font-size;
+  font-weight: $font-weight-medium;
+  line-height: 1.4;
+  color: $neutral-600;
+  margin-bottom: 0.5rem;
+  
+  @include mobile-only {
+    font-size: 1rem;
+    margin-bottom: 0.375rem;
+  }
+}
+
+h6, .h6 {
+  font-size: $h6-font-size;
+  font-weight: $font-weight-medium;
+  line-height: 1.45;
+  color: $neutral-600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  
+  @include mobile-only {
+    font-size: 0.875rem;
+    margin-bottom: 0.375rem;
+  }
+}
+
+// Page Title Styles
+.page-title {
+  font-size: $h2-font-size;
+  font-weight: $font-weight-bold;
+  color: $neutral-800;
+  margin: 0;
+  
+  @include mobile-only {
+    font-size: $h3-font-size;
+  }
+  
+  &.large {
+    font-size: $h1-font-size;
+    
+    @include mobile-only {
+      font-size: $h2-font-size;
+    }
+  }
+}
+
+// Card Title Styles
+.card-title {
+  font-size: $h5-font-size;
+  font-weight: $font-weight-semibold;
+  color: $neutral-800;
+  margin: 0;
+  
+  @include mobile-only {
+    font-size: $h6-font-size;
+  }
+  
+  &.large {
+    font-size: $h4-font-size;
+    
+    @include mobile-only {
+      font-size: $h5-font-size;
+    }
+  }
+}
+
+// Body Text Variations
+.text-large {
+  font-size: $font-size-lg;
+  line-height: $line-height-lg;
+  
+  @include mobile-only {
+    font-size: $font-size-base;
+  }
+}
+
+.text-small {
+  font-size: $font-size-sm;
+  line-height: $line-height-sm;
+  
+  @include mobile-only {
+    font-size: 0.75rem;
+  }
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  
+  @include mobile-only {
+    font-size: 0.6875rem;
+  }
+}
+
+// Font Weight Utilities
+.fw-light { font-weight: $font-weight-light; }
+.fw-normal { font-weight: $font-weight-normal; }
+.fw-medium { font-weight: $font-weight-medium; }
+.fw-semibold { font-weight: $font-weight-semibold; }
+.fw-bold { font-weight: $font-weight-bold; }
+
+// Text Color Utilities
+.text-primary { color: $primary-500 !important; }
+.text-secondary { color: $secondary-500 !important; }
+.text-success { color: $success-500 !important; }
+.text-warning { color: $warning-500 !important; }
+.text-danger { color: $danger-500 !important; }
+.text-info { color: $primary-400 !important; }
+.text-light { color: $neutral-400 !important; }
+.text-dark { color: $neutral-800 !important; }
+.text-muted { color: $neutral-500 !important; }
+
+// Enhanced Text Utilities
+.text-gradient-primary {
+  background: linear-gradient(135deg, $primary-500 0%, $primary-600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: $font-weight-bold;
+}
+
+.text-gradient-secondary {
+  background: linear-gradient(135deg, $secondary-500 0%, $secondary-600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: $font-weight-bold;
+}
+
+// Link Styles
+a {
+  color: $primary-500;
+  text-decoration: none;
+  transition: $transition-base;
+  
+  &:hover {
+    color: $primary-600;
+    text-decoration: underline;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid $primary-500;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// Special Link Variants
+.link-primary {
+  color: $primary-500;
+  
+  &:hover { color: $primary-600; }
+}
+
+.link-secondary {
+  color: $secondary-500;
+  
+  &:hover { color: $secondary-600; }
+}
+
+.link-muted {
+  color: $neutral-500;
+  
+  &:hover { 
+    color: $neutral-700;
+    text-decoration: none;
+  }
+}
+
+.link-underline-hover {
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Text Alignment Responsive
+.text-start { text-align: left; }
+.text-center { text-align: center; }
+.text-end { text-align: right; }
+
+@include mobile-only {
+  .text-sm-start { text-align: left !important; }
+  .text-sm-center { text-align: center !important; }
+  .text-sm-end { text-align: right !important; }
+}
+
+@include respond-to(md) {
+  .text-md-start { text-align: left !important; }
+  .text-md-center { text-align: center !important; }
+  .text-md-end { text-align: right !important; }
+}
+
+@include respond-to(lg) {
+  .text-lg-start { text-align: left !important; }
+  .text-lg-center { text-align: center !important; }
+  .text-lg-end { text-align: right !important; }
+}
+
+// Text Transform
+.text-lowercase { text-transform: lowercase; }
+.text-uppercase { text-transform: uppercase; }
+.text-capitalize { text-transform: capitalize; }
+
+// Line Height Utilities
+.lh-1 { line-height: 1; }
+.lh-sm { line-height: $line-height-sm; }
+.lh-base { line-height: $line-height-base; }
+.lh-lg { line-height: $line-height-lg; }
+
+// Letter Spacing
+.ls-tight { letter-spacing: -0.025em; }
+.ls-normal { letter-spacing: 0; }
+.ls-wide { letter-spacing: 0.025em; }
+.ls-wider { letter-spacing: 0.05em; }
+.ls-widest { letter-spacing: 0.1em; }
+
+// Text Overflow Utilities
+.text-truncate {
+  @include text-truncate;
+}
+
+.text-wrap { white-space: normal; }
+.text-nowrap { white-space: nowrap; }
+
+// Multi-line Text Clamp
+.text-clamp-2 { @include text-clamp(2); }
+.text-clamp-3 { @include text-clamp(3); }
+.text-clamp-4 { @include text-clamp(4); }
+
+// Readable Text Blocks
+.text-block {
+  max-width: 65ch;
+  line-height: $line-height-lg;
+  
+  @include mobile-only {
+    max-width: none;
+    line-height: $line-height-base;
+  }
+}
+
+// Form Label Enhancements
+.form-label {
+  font-weight: $font-weight-medium;
+  color: $neutral-700;
+  margin-bottom: 0.5rem;
+  font-size: $font-size-sm;
+  
+  @include mobile-only {
+    font-size: 0.8125rem;
+  }
+  
+  &.required::after {
+    content: ' *';
+    color: $danger-500;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// Help Text
+.form-text {
+  font-size: $font-size-sm;
+  color: $neutral-500;
+  margin-top: 0.25rem;
+  line-height: $line-height-sm;
+  
+  @include mobile-only {
+    font-size: 0.75rem;
+  }
+}
+
+// Status Text
+.status-text {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  
+  &.status-success {
+    color: $success-600;
+  }
+  
+  &.status-warning {
+    color: $warning-600;
+  }
+  
+  &.status-danger {
+    color: $danger-600;
+  }
+  
+  &.status-info {
+    color: $primary-600;
+  }
+}
+
+// Accessibility Enhancements
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// High Contrast Mode
+@media (prefers-contrast: high) {
+  body {
+    color: $neutral-900;
+  }
+  
+  h1, h2, h3, h4, h5, h6,
+  .page-title, .card-title {
+    color: $neutral-900;
+  }
+  
+  .text-muted {
+    color: $neutral-700 !important;
+  }
+  
+  a {
+    text-decoration: underline;
+    
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid;
+    color: black;
+  }
+  
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+  
+  .text-gradient-primary,
+  .text-gradient-secondary {
+    -webkit-text-fill-color: black;
+    background: none;
+  }
+}

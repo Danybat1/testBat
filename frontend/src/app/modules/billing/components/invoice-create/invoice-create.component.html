@@ -1,0 +1,309 @@
+<div class="invoice-create-container">
+  <div class="header-section">
+    <h2><i class="fas fa-file-invoice-dollar"></i> Créer une Facture</h2>
+    <p class="subtitle">Générez une facture complète pour vos services de transport</p>
+  </div>
+
+  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()" class="invoice-form">
+    
+    <!-- Client & Basic Info Section -->
+    <div class="form-section">
+      <h3><i class="fas fa-user-tie"></i> Informations Client</h3>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="clientId">Client *</label>
+          <select id="clientId" formControlName="clientId" class="form-control">
+            <option value="">Sélectionner un client</option>
+            <option *ngFor="let client of clients" [value]="client.id">
+              {{client.name}}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="invoiceForm.get('clientId')?.invalid && invoiceForm.get('clientId')?.touched">
+            Veuillez sélectionner un client
+          </div>
+        </div>
+        
+        <div class="form-group col-md-3">
+          <label for="invoiceDate">Date de Facture *</label>
+          <input type="date" id="invoiceDate" formControlName="invoiceDate" class="form-control">
+        </div>
+        
+        <div class="form-group col-md-3">
+          <label for="dueDate">Date d'Échéance *</label>
+          <input type="date" id="dueDate" formControlName="dueDate" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="type">Type de Facture *</label>
+          <select id="type" formControlName="type" class="form-control">
+            <option *ngFor="let type of invoiceTypes" [value]="type">
+              {{type === 'TRANSPORT' ? 'Transport de Marchandises' : 
+                type === 'PASSENGER' ? 'Transport de Passagers' : 
+                type === 'ADDITIONAL_SERVICES' ? 'Services Additionnels' : 'Mixte'}}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group col-md-4">
+          <label for="paymentTerms">Conditions de Paiement *</label>
+          <select id="paymentTerms" formControlName="paymentTerms" class="form-control">
+            <option *ngFor="let term of paymentTerms" [value]="term">
+              {{term === 'IMMEDIATE' ? 'Immédiat' : 
+                term === 'NET_15' ? 'Net 15 jours' : 
+                term === 'NET_30' ? 'Net 30 jours' : 
+                term === 'NET_45' ? 'Net 45 jours' : 'Net 60 jours'}}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group col-md-4">
+          <label for="currency">Devise *</label>
+          <select id="currency" formControlName="currency" class="form-control">
+            <option *ngFor="let currency of currencies" [value]="currency">
+              {{currency === 'CDF' ? 'CDF (Franc Congolais)' : 'USD (Dollar Américain)'}}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Billing Address Section -->
+    <div class="form-section" formGroupName="billingAddress">
+      <h3><i class="fas fa-map-marker-alt"></i> Adresse de Facturation</h3>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="name">Nom/Raison Sociale *</label>
+          <input type="text" id="name" formControlName="name" class="form-control">
+        </div>
+        
+        <div class="form-group col-md-6">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email" class="form-control">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group col-md-8">
+          <label for="address">Adresse *</label>
+          <input type="text" id="address" formControlName="address" class="form-control">
+        </div>
+        
+        <div class="form-group col-md-4">
+          <label for="phone">Téléphone</label>
+          <input type="tel" id="phone" formControlName="phone" class="form-control">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="city">Ville *</label>
+          <input type="text" id="city" formControlName="city" class="form-control">
+        </div>
+        
+        <div class="form-group col-md-3">
+          <label for="postalCode">Code Postal</label>
+          <input type="text" id="postalCode" formControlName="postalCode" class="form-control">
+        </div>
+        
+        <div class="form-group col-md-3">
+          <label for="country">Pays *</label>
+          <input type="text" id="country" formControlName="country" class="form-control">
+        </div>
+        
+        <div class="form-group col-md-2">
+          <label for="taxId">N° TVA</label>
+          <input type="text" id="taxId" formControlName="taxId" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <!-- LTA Selection Section -->
+    <div class="form-section" *ngIf="availableLTAs.length > 0">
+      <h3><i class="fas fa-truck"></i> LTA Associées</h3>
+      <div class="lta-selection">
+        <p class="help-text">Sélectionnez les LTA à inclure dans cette facture (optionnel)</p>
+        <div class="lta-grid">
+          <div *ngFor="let lta of availableLTAs" class="lta-card">
+            <label class="lta-checkbox">
+              <input type="checkbox" 
+                     [value]="lta.id" 
+                     (change)="onLTACheckboxChange($event, lta.id!)"
+                     class="form-check-input">
+              <div class="lta-info">
+                <strong>LTA {{lta.ltaNumber || lta.id}}</strong>
+                <span class="lta-route">{{lta.originCity}} → {{lta.destinationCity}}</span>
+                <span class="lta-cost">{{lta.totalCost | currency:'CDF':'symbol':'1.0-0'}}</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Items Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3><i class="fas fa-list"></i> Articles de la Facture</h3>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addItem()">
+          <i class="fas fa-plus"></i> Ajouter un Article
+        </button>
+      </div>
+
+      <div class="items-container" formArrayName="items">
+        <div *ngIf="items.length === 0" class="empty-items">
+          <i class="fas fa-inbox"></i>
+          <p>Aucun article ajouté. Cliquez sur "Ajouter un Article" pour commencer.</p>
+        </div>
+
+        <div *ngFor="let item of items.controls; let i = index" 
+             [formGroupName]="i" 
+             class="item-row">
+          <div class="item-header">
+            <span class="item-number">Article {{i + 1}}</span>
+            <button type="button" 
+                    class="btn btn-outline-danger btn-sm" 
+                    (click)="removeItem(i)"
+                    *ngIf="items.length > 0">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group col-md-5">
+              <label>Description *</label>
+              <input type="text" formControlName="description" class="form-control" 
+                     placeholder="Description du service/produit">
+            </div>
+            
+            <div class="form-group col-md-2">
+              <label>Quantité *</label>
+              <input type="number" formControlName="quantity" class="form-control" 
+                     min="0.01" step="0.01">
+            </div>
+            
+            <div class="form-group col-md-2">
+              <label>Prix Unitaire *</label>
+              <input type="number" formControlName="unitPrice" class="form-control" 
+                     min="0" step="0.01">
+            </div>
+            
+            <div class="form-group col-md-2">
+              <label>Taux TVA (%)</label>
+              <input type="number" formControlName="taxRate" class="form-control" 
+                     min="0" max="100" step="0.01">
+            </div>
+            
+            <div class="form-group col-md-1">
+              <label>Total</label>
+              <div class="item-total">
+                {{(item.get('quantity')?.value * item.get('unitPrice')?.value) | currency:'XOF':'symbol':'1.0-0'}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals Summary -->
+      <div class="totals-section" *ngIf="items.length > 0">
+        <div class="totals-card">
+          <div class="total-row">
+            <span>Sous-total:</span>
+            <span class="amount">{{subtotal | currency:'XOF':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="total-row">
+            <span>TVA:</span>
+            <span class="amount">{{totalTax | currency:'XOF':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="total-row total-final">
+            <span><strong>Total TTC:</strong></span>
+            <span class="amount"><strong>{{totalAmount | currency:'XOF':'symbol':'1.0-0'}}</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="form-section">
+      <h3><i class="fas fa-sticky-note"></i> Notes</h3>
+      <div class="form-group">
+        <label for="notes">Notes pour le client</label>
+        <textarea id="notes" 
+                  formControlName="notes" 
+                  class="form-control" 
+                  rows="3"
+                  placeholder="Notes additionnelles, conditions particulières, etc."></textarea>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button type="button" 
+              class="btn btn-secondary" 
+              (click)="onCancel()"
+              [disabled]="loading">
+        <i class="fas fa-times"></i> Annuler
+      </button>
+      
+      <button type="button" 
+              class="btn btn-info" 
+              (click)="previewInvoice()"
+              [disabled]="loading || invoiceForm.invalid || items.length === 0">
+        <i class="fas fa-eye"></i> Aperçu
+      </button>
+      
+      <button type="submit" 
+              class="btn btn-primary" 
+              [disabled]="loading || invoiceForm.invalid">
+        <i class="fas fa-save" *ngIf="!loading"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+        {{loading ? 'Création...' : 'Créer la Facture'}}
+      </button>
+    </div>
+  </form>
+
+  <!-- Preview Modal -->
+  <div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="previewModalLabel">
+            <i class="fas fa-eye"></i> Aperçu de la Facture
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body p-0">
+          <div *ngIf="previewLoading" class="text-center p-4">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p class="mt-2">Génération de l'aperçu...</p>
+          </div>
+          <div *ngIf="previewError" class="alert alert-danger m-3">
+            <i class="fas fa-exclamation-triangle"></i>
+            Erreur lors de la génération de l'aperçu: {{previewError}}
+          </div>
+          <div *ngIf="!previewLoading && !previewError" class="alert alert-info m-3">
+            <strong>Debug:</strong> previewHtml existe: {{!!previewHtml}} | Longueur: {{previewHtml ? 'Oui' : 'Non'}}
+          </div>
+          <div *ngIf="previewHtml && !previewLoading && !previewError" 
+               class="preview-content"
+               [innerHTML]="previewHtml">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times"></i> Fermer
+          </button>
+          <button type="button" 
+                  class="btn btn-success" 
+                  (click)="downloadPdf()"
+                  [disabled]="!createdInvoiceId || previewLoading">
+            <i class="fas fa-download"></i> Télécharger PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

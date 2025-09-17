@@ -1,0 +1,293 @@
+<div class="client-tracking-container">
+  <!-- Header Section -->
+  <div class="tracking-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center">
+          <h1 class="tracking-title">
+            <i class="fas fa-search-location"></i>
+            Suivi de Colis
+          </h1>
+          <p class="tracking-subtitle">
+            Suivez votre envoi en temps réel avec votre numéro de suivi
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="search-card">
+            <form [formGroup]="trackingForm" (ngSubmit)="onSearch()" class="tracking-form">
+              <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-barcode"></i>
+                  </span>
+                </div>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="trackingNumber"
+                  placeholder="Entrez votre numéro de suivi (ex: FO12345678)"
+                  [class.is-invalid]="trackingForm.get('trackingNumber')?.invalid && trackingForm.get('trackingNumber')?.touched">
+                <div class="input-group-append">
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary btn-search"
+                    [disabled]="loading">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!loading" class="fas fa-search me-2"></i>
+                    {{ loading ? 'Recherche...' : 'Suivre' }}
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Validation Error -->
+              <div *ngIf="trackingForm.get('trackingNumber')?.invalid && trackingForm.get('trackingNumber')?.touched" 
+                   class="invalid-feedback d-block mt-2">
+                <small>Le numéro de suivi est requis (minimum 3 caractères)</small>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Section -->
+  <div *ngIf="error && searched" class="error-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = null"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div *ngIf="shipment" class="results-section">
+    <div class="container">
+      <!-- Shipment Overview -->
+      <div class="row">
+        <div class="col-12">
+          <div class="shipment-overview-card">
+            <div class="card-header">
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <h3 class="mb-0">
+                    <i class="fas fa-box me-2"></i>
+                    {{ shipment.trackingNumber }}
+                  </h3>
+                  <p class="text-muted mb-0">{{ shipment.description || 'Colis' }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                  <span class="status-badge" [style.background-color]="getStatusColor(shipment.status)">
+                    {{ getStatusLabel(shipment.status) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-section">
+              <div class="progress mb-3">
+                <div class="progress-bar" 
+                     [style.width.%]="getStatusProgress()"
+                     [style.background-color]="getStatusColor(shipment.status)">
+                </div>
+              </div>
+
+              <!-- Progress Steps -->
+              <div class="progress-steps">
+                <div class="row">
+                  <div *ngFor="let step of getProgressSteps(); let i = index" 
+                       class="col step-item"
+                       [class.completed]="step.completed"
+                       [class.current]="step.current"
+                       [class.active]="step.active">
+                    <div class="step-icon">
+                      <i [class]="step.icon"></i>
+                    </div>
+                    <div class="step-label">{{ step.label }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Information -->
+      <div class="row mt-4">
+        <div class="col-lg-6">
+          <div class="info-card">
+            <div class="card-header">
+              <h5><i class="fas fa-truck me-2"></i>Informations de Livraison</h5>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">Destinataire:</span>
+                <span class="value">{{ shipment.recipientName }}</span>
+              </div>
+              <div class="info-row" *ngIf="shipment.recipientCompany">
+                <span class="label">Société:</span>
+                <span class="value">{{ shipment.recipientCompany }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Adresse:</span>
+                <span class="value">
+                  {{ shipment.recipientAddress }}<br>
+                  {{ shipment.recipientCity }}, {{ shipment.recipientCountry }}
+                </span>
+              </div>
+              <div class="info-row" *ngIf="shipment.expectedDeliveryDate">
+                <span class="label">Livraison prévue:</span>
+                <span class="value estimated-delivery" 
+                      [class.overdue]="getEstimatedDelivery() === 'Retard de livraison'">
+                  {{ getEstimatedDelivery() }}
+                  <small class="d-block text-muted">{{ formatDateShort(shipment.expectedDeliveryDate) }}</small>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="info-card">
+            <div class="card-header">
+              <h5><i class="fas fa-info-circle me-2"></i>Détails du Colis</h5>
+            </div>
+            <div class="card-body">
+              <div class="info-row" *ngIf="shipment.senderName">
+                <span class="label">Expéditeur:</span>
+                <span class="value">{{ shipment.senderName }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Nombre de colis:</span>
+                <span class="value">{{ shipment.packageCount }}</span>
+              </div>
+              <div class="info-row" *ngIf="shipment.totalWeight">
+                <span class="label">Poids total:</span>
+                <span class="value">{{ shipment.totalWeight }} kg</span>
+              </div>
+              <div class="info-row" *ngIf="shipment.pickupDate">
+                <span class="label">Date d'enlèvement:</span>
+                <span class="value">{{ formatDateShort(shipment.pickupDate) }}</span>
+              </div>
+              <div class="info-row" *ngIf="shipment.actualDeliveryDate">
+                <span class="label">Date de livraison:</span>
+                <span class="value delivered">{{ formatDate(shipment.actualDeliveryDate) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tracking Events -->
+      <div class="row mt-4" *ngIf="shipment.trackingEvents && shipment.trackingEvents.length > 0">
+        <div class="col-12">
+          <div class="tracking-events-card">
+            <div class="card-header">
+              <h5><i class="fas fa-history me-2"></i>Historique de Suivi</h5>
+            </div>
+            <div class="card-body">
+              <div class="timeline">
+                <div *ngFor="let event of shipment.trackingEvents; let first = first" 
+                     class="timeline-item" [class.latest]="first">
+                  <div class="timeline-marker" [style.background-color]="getStatusColor(event.status)">
+                    <i class="fas fa-circle"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <h6 class="timeline-title">{{ getStatusLabel(event.status) }}</h6>
+                      <span class="timeline-date">{{ formatDate(event.eventDate) }}</span>
+                    </div>
+                    <p class="timeline-description">{{ event.description }}</p>
+                    <div *ngIf="event.location || event.city" class="timeline-location">
+                      <i class="fas fa-map-marker-alt me-1"></i>
+                      {{ event.location || event.city }}
+                      <span *ngIf="event.country">, {{ event.country }}</span>
+                    </div>
+                    <div *ngIf="event.operatorName" class="timeline-operator">
+                      <i class="fas fa-user me-1"></i>
+                      {{ event.operatorName }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Confirmation -->
+      <div class="row mt-4" *ngIf="isDelivered()">
+        <div class="col-12">
+          <div class="delivery-confirmation">
+            <div class="success-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h4>Colis Livré avec Succès!</h4>
+            <p *ngIf="shipment.actualDeliveryDate">
+              Livré le {{ formatDate(shipment.actualDeliveryDate) }}
+            </p>
+            <p *ngIf="shipment.deliverySignature" class="signature-info">
+              <i class="fas fa-signature me-2"></i>
+              Signé par: {{ shipment.deliverySignature }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exception Alert -->
+      <div class="row mt-4" *ngIf="isException()">
+        <div class="col-12">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Attention:</strong> Un problème a été signalé pour votre envoi. 
+            Contactez notre service client pour plus d'informations.
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="row mt-4">
+        <div class="col-12 text-center">
+          <button type="button" class="btn btn-outline-primary me-3" (click)="trackAnother()">
+            <i class="fas fa-search me-2"></i>
+            Suivre un autre colis
+          </button>
+          <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>
+            Imprimer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Results -->
+  <div *ngIf="searched && !loading && !shipment && !error" class="no-results-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+          <div class="no-results">
+            <i class="fas fa-search"></i>
+            <h4>Aucun résultat trouvé</h4>
+            <p>Vérifiez votre numéro de suivi et réessayez.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

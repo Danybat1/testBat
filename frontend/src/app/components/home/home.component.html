@@ -1,0 +1,146 @@
+<!-- Header Section -->
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      
+      <!-- Logo Section -->
+      <div class="logo-section">
+        <h1 class="app-title">
+          <i class="bi bi-truck"></i>
+          FreightOps
+        </h1>
+        <p class="app-subtitle">Système de gestion de transport aérien</p>
+      </div>
+      
+      <!-- User Section -->
+      <div class="user-section" *ngIf="getCurrentUser()">
+        <div class="user-info">
+          <i class="bi bi-person-circle"></i>
+          <span class="username">{{ getCurrentUser()?.username }}</span>
+          <div class="user-roles">
+            <span class="role-badge" *ngFor="let role of getCurrentUser()?.roles">
+              {{ role.replace('ROLE_', '') }}
+            </span>
+          </div>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
+          Déconnexion
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="container">
+
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <h2 class="welcome-title">
+        Bienvenue dans FreightOps
+      </h2>
+      <p class="welcome-description">
+        Accédez rapidement aux différents modules de gestion de votre système de transport aérien
+      </p>
+    </section>
+
+    <!-- Modules Grid -->
+    <section class="modules-section">
+      <div class="modules-grid">
+        <div 
+          *ngFor="let module of modules" 
+          class="module-card"
+          [ngClass]="[
+            'module-card--' + module.color,
+            !canAccessModule(module) ? 'module-card--disabled' : ''
+          ]"
+          (click)="canAccessModule(module) && navigateToModule(module.route)"
+        >
+          <div class="module-card__header">
+            <div class="module-card__icon">
+              <i class="bi" [ngClass]="'bi-' + module.icon"></i>
+            </div>
+            <div class="module-card__access" *ngIf="!canAccessModule(module)">
+              <i class="bi bi-lock"></i>
+            </div>
+          </div>
+          
+          <div class="module-card__content">
+            <h3 class="module-card__title">{{ module.title }}</h3>
+            <p class="module-card__description">{{ module.description }}</p>
+            
+            <div class="module-card__footer" *ngIf="module.requiredRole">
+              <span class="required-role">
+                <i class="bi bi-shield-check"></i>
+                Requis : {{ module.requiredRole }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="module-card__arrow" *ngIf="canAccessModule(module)">
+            <i class="bi bi-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats Section -->
+    <section class="stats-section">
+      <h3 class="stats-title">Aperçu rapide</h3>
+      <div class="stats-grid">
+        
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <i class="bi bi-file-earmark-text"></i>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__value">--</div>
+            <div class="stat-card__label">LTA Actives</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <i class="bi bi-people"></i>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__value">--</div>
+            <div class="stat-card__label">Clients</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <i class="bi bi-calendar-check"></i>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__value">--</div>
+            <div class="stat-card__label">Expéditions ce mois</div>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card__icon">
+            <i class="bi bi-currency-euro"></i>
+          </div>
+          <div class="stat-card__content">
+            <div class="stat-card__value">--</div>
+            <div class="stat-card__label">Chiffre d'affaires</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2024 FreightOps - Système de gestion de transport aérien</p>
+  </div>
+</footer>

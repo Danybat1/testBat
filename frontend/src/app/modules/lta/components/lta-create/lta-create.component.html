@@ -1,0 +1,776 @@
+<!-- Modern Responsive LTA Create/Edit Component -->
+<div class="lta-create-container">
+  <div class="container-fluid">
+    
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+      <div class="row align-items-center">
+        <div class="col-12 col-lg-8">
+          <div class="d-flex flex-column align-items-center text-center gap-3">
+            <div>
+              <h1 class="page-title h3 mb-1">
+                <i class="fas fa-file-plus text-primary me-2 d-none d-sm-inline"></i>
+                {{ isEditMode ? 'Modifier la LTA' : 'Créer une nouvelle LTA' }}
+              </h1>
+              <p class="text-muted mb-0 small">
+                {{ isEditMode ? 'Modifier les informations de la LTA' : 'Remplissez les informations pour créer une nouvelle LTA' }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="page-actions">
+            <button 
+              type="button"
+              class="btn btn-outline-primary w-100 w-lg-auto"
+              (click)="onCancel()">
+              <i class="fas fa-arrow-left me-2"></i>
+              <span class="d-none d-sm-inline">Retour à la </span>liste
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accordion Form Layout -->
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
+        <form [formGroup]="ltaForm" (ngSubmit)="onSubmit()" class="lta-form">
+          
+          <!-- Bootstrap Accordion -->
+          <div class="accordion accordion-flush" id="ltaAccordion">
+            
+            <!-- Section 1: Informations d'itinéraire -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingRoute">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapseRoute" aria-expanded="true" aria-controls="collapseRoute">
+                  <i class="fas fa-route text-primary me-3"></i>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Informations d'itinéraire</span>
+                    <small class="text-muted">Ville d'origine et de destination</small>
+                  </div>
+                </button>
+              </h2>
+              <div id="collapseRoute" class="accordion-collapse collapse show" 
+                   aria-labelledby="headingRoute" data-bs-parent="#ltaAccordion">
+                <div class="accordion-body p-4">
+                  <div class="row g-4">
+                    <!-- Origin City -->
+                    <div class="col-12 col-lg-6">
+                      <div class="form-group">
+                        <label for="originCity" class="form-label required">
+                          <i class="fas fa-plane-departure text-success me-2"></i>
+                          Ville d'origine
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-success text-white">
+                            <i class="fas fa-map-marker-alt"></i>
+                          </span>
+                          <select 
+                            id="originCity"
+                            class="form-select"
+                            formControlName="originCity"
+                            [class.is-invalid]="ltaForm.get('originCity')?.invalid && ltaForm.get('originCity')?.touched"
+                            aria-describedby="originCity-help">
+                            <option value="">Sélectionner une ville d'origine</option>
+                            <option 
+                              *ngFor="let city of allCities" 
+                              [value]="city.id">
+                              {{ city.name }} ({{ city.iataCode }})
+                            </option>
+                          </select>
+                        </div>
+                        <div id="originCity-help" class="form-text">Choisissez la ville de départ du fret</div>
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('originCity')?.invalid && ltaForm.get('originCity')?.touched">
+                          <i class="fas fa-exclamation-circle me-1"></i>
+                          {{ getErrorMessage('originCity') }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Destination City -->
+                    <div class="col-12 col-lg-6">
+                      <div class="form-group">
+                        <label for="destinationCity" class="form-label required">
+                          <i class="fas fa-plane-arrival text-danger me-2"></i>
+                          Ville de destination
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-danger text-white">
+                            <i class="fas fa-map-marker-alt"></i>
+                          </span>
+                          <select 
+                            id="destinationCity"
+                            class="form-select"
+                            formControlName="destinationCity"
+                            [class.is-invalid]="ltaForm.get('destinationCity')?.invalid && ltaForm.get('destinationCity')?.touched"
+                            aria-describedby="destinationCity-help">
+                            <option value="">Sélectionner une ville de destination</option>
+                            <option 
+                              *ngFor="let city of allCities" 
+                              [value]="city.id">
+                              {{ city.name }} ({{ city.iataCode }})
+                            </option>
+                          </select>
+                        </div>
+                        <div id="destinationCity-help" class="form-text">Choisissez la ville de destination du fret</div>
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('destinationCity')?.invalid && ltaForm.get('destinationCity')?.touched">
+                          <i class="fas fa-exclamation-circle me-1"></i>
+                          {{ getErrorMessage('destinationCity') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Informations de paiement et client -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingPayment">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapsePayment" aria-expanded="false" aria-controls="collapsePayment">
+                  <i class="fas fa-credit-card text-info me-3"></i>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Informations de paiement et client</span>
+                    <small class="text-muted">Mode de paiement et sélection du client</small>
+                  </div>
+                </button>
+              </h2>
+              <div id="collapsePayment" class="accordion-collapse collapse" 
+                   aria-labelledby="headingPayment" data-bs-parent="#ltaAccordion">
+                <div class="accordion-body p-4">
+                  <div class="row g-4">
+                    <!-- Payment Mode -->
+                    <div class="col-12 col-lg-6">
+                      <div class="form-group">
+                        <label for="paymentMode" class="form-label required">
+                          <i class="fas fa-wallet text-primary me-2"></i>
+                          Mode de paiement
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-primary text-white">
+                            <i class="fas fa-money-bill-wave"></i>
+                          </span>
+                          <select 
+                            id="paymentMode"
+                            class="form-select"
+                            formControlName="paymentMode"
+                            [class.is-invalid]="ltaForm.get('paymentMode')?.invalid && ltaForm.get('paymentMode')?.touched"
+                            aria-describedby="paymentMode-help">
+                            <option value="{{ PaymentMode.CASH }}">Espèces</option>
+                            <option value="{{ PaymentMode.TO_INVOICE }}">À facturer</option>
+                            <option value="{{ PaymentMode.FREIGHT_COLLECT }}">Port dû</option>
+                            <option value="{{ PaymentMode.FREE }}">Gratuit</option>
+                          </select>
+                        </div>
+                        <div id="paymentMode-help" class="form-text">Sélectionnez le mode de paiement pour cette LTA</div>
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('paymentMode')?.invalid && ltaForm.get('paymentMode')?.touched">
+                          <i class="fas fa-exclamation-circle me-1"></i>
+                          {{ getErrorMessage('paymentMode') }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Client (conditional) -->
+                    <div class="col-12 col-md-6" *ngIf="isClientRequired">
+                      <div class="form-group">
+                        <label for="client" class="form-label">
+                          <i class="bi bi-person-badge text-primary me-2"></i>
+                          Client *
+                        </label>
+                        <div class="position-relative">
+                          <div class="input-group">
+                            <span class="input-group-text bg-primary text-white">
+                              <i class="bi bi-person-search"></i>
+                            </span>
+                            <input 
+                              type="text"
+                              id="client"
+                              class="form-control"
+                              formControlName="clientSearch"
+                              placeholder="Tapez pour rechercher un client..."
+                              [class.is-invalid]="ltaForm.get('client')?.invalid && ltaForm.get('client')?.touched"
+                              autocomplete="off"
+                              (input)="onClientSearchInput($event)"
+                              (focus)="onClientSearchFocus()"
+                              (blur)="onClientSearchBlur()"
+                              (keydown)="onClientSearchKeydown($event)">
+                            <span class="input-group-text" *ngIf="isSearchingClients">
+                              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Recherche...</span>
+                              </div>
+                            </span>
+                            <button type="button" 
+                                    class="btn btn-outline-secondary" 
+                                    *ngIf="selectedClient"
+                                    (click)="clearClientSelection()"
+                                    title="Effacer la sélection">
+                              <i class="bi bi-x-lg"></i>
+                            </button>
+                          </div>
+                          
+                          <!-- Enhanced Client Dropdown Results -->
+                          <div class="client-dropdown position-absolute w-100" 
+                               *ngIf="showClientDropdown"
+                               style="z-index: 1050; max-height: 350px; overflow-y: auto;">
+                            <div class="card shadow-lg border-0">
+                              <div class="card-header bg-primary text-white py-2">
+                                <div class="d-flex align-items-center justify-content-between">
+                                  <div class="d-flex align-items-center">
+                                    <i class="bi bi-people me-2"></i>
+                                    <span class="fw-semibold">Clients disponibles</span>
+                                  </div>
+                                  <span class="badge bg-light text-primary" *ngIf="(filteredClients$ | async) as clients">
+                                    {{ clients.length }}
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div class="card-body p-0" *ngIf="(filteredClients$ | async) as clients">
+                                <!-- Search Results -->
+                                <div class="client-list" *ngIf="clients.length > 0">
+                                  <button type="button" 
+                                          class="dropdown-item client-item d-flex align-items-center py-3 px-3 border-0"
+                                          *ngFor="let client of clients; trackBy: trackByClientId; let i = index"
+                                          [class.active]="selectedIndex === i"
+                                          (click)="selectClient(client)"
+                                          (mouseenter)="selectedIndex = i">
+                                    <div class="client-avatar me-3">
+                                      <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                           style="width: 40px; height: 40px;">
+                                        <i class="bi bi-building"></i>
+                                      </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                      <div class="client-name fw-semibold text-dark mb-1" 
+                                           [innerHTML]="highlightSearchTerm(client.name, currentSearchTerm)">
+                                      </div>
+                                      <div class="client-details">
+                                        <small class="text-muted d-block">
+                                          <i class="bi bi-telephone me-1 text-success"></i>
+                                          <span [innerHTML]="highlightSearchTerm(client.contactNumber || '', currentSearchTerm)"></span>
+                                        </small>
+                                        <small class="text-muted d-block" *ngIf="client.email">
+                                          <i class="bi bi-envelope me-1 text-info"></i>
+                                          <span [innerHTML]="highlightSearchTerm(client.email, currentSearchTerm)"></span>
+                                        </small>
+                                      </div>
+                                    </div>
+                                    <div class="client-select">
+                                      <i class="bi bi-arrow-right text-primary"></i>
+                                    </div>
+                                  </button>
+                                </div>
+                                
+                                <!-- No Results -->
+                                <div class="no-results text-center py-4" *ngIf="clients.length === 0 && !isSearchingClients">
+                                  <i class="bi bi-search text-muted fs-1 mb-2"></i>
+                                  <p class="text-muted mb-1">Aucun client trouvé</p>
+                                  <small class="text-muted">
+                                    Essayez avec un autre terme de recherche
+                                  </small>
+                                </div>
+                                
+                                <!-- Loading State -->
+                                <div class="loading-state text-center py-4" *ngIf="isSearchingClients">
+                                  <div class="spinner-border text-primary mb-2" role="status">
+                                    <span class="visually-hidden">Recherche en cours...</span>
+                                  </div>
+                                  <p class="text-muted mb-0">Recherche en cours...</p>
+                                </div>
+                              </div>
+                              
+                              <!-- Footer with keyboard shortcuts -->
+                              <div class="card-footer bg-light py-2" *ngIf="(filteredClients$ | async)?.length">
+                                <small class="text-muted">
+                                  <i class="bi bi-keyboard me-1"></i>
+                                  Utilisez ↑↓ pour naviguer, Entrée pour sélectionner
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Selected Client Display -->
+                          <div class="selected-client mt-2 p-2 bg-light border rounded" *ngIf="selectedClient">
+                            <div class="d-flex align-items-center justify-content-between">
+                              <div class="flex-grow-1">
+                                <div class="fw-semibold text-success">
+                                  <i class="bi bi-check-circle me-2"></i>{{ selectedClient.name }}
+                                </div>
+                                <small class="text-muted">
+                                  {{ selectedClient.contactNumber }}
+                                  <span *ngIf="selectedClient.email" class="ms-2">• {{ selectedClient.email }}</span>
+                                </small>
+                              </div>
+                              <button type="button" 
+                                      class="btn btn-sm btn-outline-secondary"
+                                      (click)="clearClientSelection()"
+                                      title="Changer de client">
+                                <i class="bi bi-x-lg"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('client')?.invalid && ltaForm.get('client')?.touched">
+                          {{ getErrorMessage('client') }}
+                        </div>
+                        
+                        <div class="form-text">
+                          <i class="bi bi-info-circle me-1"></i>
+                          Sélectionnez un client existant ou tapez pour rechercher
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Informations du colis -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingPackage">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapsePackage" aria-expanded="false" aria-controls="collapsePackage">
+                  <i class="fas fa-box text-warning me-3"></i>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Informations du colis</span>
+                    <small class="text-muted">Poids, nombre et nature des colis</small>
+                  </div>
+                </button>
+              </h2>
+              <div id="collapsePackage" class="accordion-collapse collapse" 
+                   aria-labelledby="headingPackage" data-bs-parent="#ltaAccordion">
+                <div class="accordion-body p-4">
+                  <div class="row g-4">
+                    <!-- Total Weight -->
+                    <div class="col-12 col-md-4">
+                      <div class="form-group">
+                        <label for="totalWeight" class="form-label">
+                          <i class="bi bi-speedometer text-warning me-2"></i>
+                          Poids total (kg) *
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-warning text-dark">
+                            <i class="bi bi-box-seam"></i>
+                          </span>
+                          <input 
+                            type="number"
+                            id="totalWeight"
+                            class="form-control"
+                            formControlName="totalWeight"
+                            placeholder="⚖️ 0.0 kg"
+                            step="0.1"
+                            min="0.1"
+                            [class.is-invalid]="ltaForm.get('totalWeight')?.invalid && ltaForm.get('totalWeight')?.touched">
+                          <span class="input-group-text">kg</span>
+                        </div>
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('totalWeight')?.invalid && ltaForm.get('totalWeight')?.touched">
+                          <i class="bi bi-exclamation-circle me-1"></i>
+                          {{ getErrorMessage('totalWeight') }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Package Count -->
+                    <div class="col-12 col-md-4">
+                      <div class="form-group">
+                        <label for="packageCount" class="form-label">
+                          <i class="bi bi-boxes text-info me-2"></i>
+                          Nombre de colis *
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-info text-white">
+                            <i class="bi bi-123"></i>
+                          </span>
+                          <input 
+                            type="number"
+                            id="packageCount"
+                            class="form-control"
+                            formControlName="packageCount"
+                            placeholder="📦 Nombre de colis"
+                            min="1"
+                            [class.is-invalid]="ltaForm.get('packageCount')?.invalid && ltaForm.get('packageCount')?.touched">
+                          <span class="input-group-text">colis</span>
+                        </div>
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('packageCount')?.invalid && ltaForm.get('packageCount')?.touched">
+                          <i class="bi bi-exclamation-circle me-1"></i>
+                          {{ getErrorMessage('packageCount') }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cost Calculation Display -->
+                    <div class="col-12 col-md-4" *ngIf="canCalculateCost">
+                      <div class="form-group">
+                        <label class="form-label">
+                          <i class="bi bi-calculator text-success me-2"></i>
+                          <strong>Coût calculé</strong>
+                        </label>
+                        <div class="cost-display p-4 border-2 border-success rounded bg-success bg-opacity-10">
+                          <div class="d-flex align-items-center justify-content-center" *ngIf="calculatedCostFormatted$ | async as formattedCost; else noCost">
+                            <i class="bi bi-currency-dollar text-success fs-2 me-3"></i>
+                            <div class="text-center">
+                              <div class="badge bg-success fs-4 px-4 py-3 mb-2">
+                                💰 {{ formattedCost }}
+                              </div>
+                              <div class="small text-muted">
+                                Coût calculé automatiquement
+                                <span *ngIf="currentCurrency$ | async as currency"> en {{ currency }}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <ng-template #noCost>
+                            <div class="text-center text-muted">
+                              <i class="bi bi-calculator fs-2 mb-2"></i>
+                              <div>Saisissez le poids pour calculer le coût</div>
+                            </div>
+                          </ng-template>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Package Nature -->
+                    <div class="col-12">
+                      <div class="form-group">
+                        <label for="packageNature" class="form-label">Nature du colis *</label>
+                        <input 
+                          type="text"
+                          id="packageNature"
+                          class="form-control"
+                          formControlName="packageNature"
+                          placeholder="ex: Électronique, Textiles, Documents..."
+                          maxlength="200"
+                          [class.is-invalid]="ltaForm.get('packageNature')?.invalid && ltaForm.get('packageNature')?.touched">
+                        <div class="invalid-feedback" *ngIf="ltaForm.get('packageNature')?.invalid && ltaForm.get('packageNature')?.touched">
+                          {{ getErrorMessage('packageNature') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 4: Informations expéditeur et destinataire -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingShipper">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapseShipper" aria-expanded="false" aria-controls="collapseShipper">
+                  <i class="fas fa-users text-success me-3"></i>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Informations expéditeur et destinataire</span>
+                    <small class="text-muted">Noms, adresses et numéros de téléphone</small>
+                  </div>
+                </button>
+              </h2>
+              <div id="collapseShipper" class="accordion-collapse collapse" 
+                   aria-labelledby="headingShipper" data-bs-parent="#ltaAccordion">
+                <div class="accordion-body p-4">
+                  <div class="row g-4">
+                    <!-- Shipper Name -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="shipperName" class="form-label">
+                          <i class="fas fa-user-tie text-primary me-2"></i>
+                          Nom de l'expéditeur
+                        </label>
+                        <input 
+                          type="text"
+                          id="shipperName"
+                          class="form-control"
+                          formControlName="shipperName"
+                          placeholder="Nom de l'expéditeur"
+                          maxlength="200">
+                      </div>
+                    </div>
+
+                    <!-- Shipper Phone -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="shipperPhone" class="form-label">
+                          <i class="fas fa-phone text-success me-2"></i>
+                          Téléphone expéditeur
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-success text-white">
+                            <i class="fas fa-phone"></i>
+                          </span>
+                          <input 
+                            type="tel"
+                            id="shipperPhone"
+                            class="form-control"
+                            formControlName="shipperPhone"
+                            placeholder="+243 XXX XXX XXX"
+                            maxlength="20">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Consignee Name -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="consigneeName" class="form-label">
+                          <i class="fas fa-user-check text-info me-2"></i>
+                          Nom du destinataire
+                        </label>
+                        <input 
+                          type="text"
+                          id="consigneeName"
+                          class="form-control"
+                          formControlName="consigneeName"
+                          placeholder="Nom du destinataire"
+                          maxlength="200">
+                      </div>
+                    </div>
+
+                    <!-- Consignee Phone -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="consigneePhone" class="form-label">
+                          <i class="fas fa-phone text-warning me-2"></i>
+                          Téléphone destinataire
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-warning text-dark">
+                            <i class="fas fa-phone"></i>
+                          </span>
+                          <input 
+                            type="tel"
+                            id="consigneePhone"
+                            class="form-control"
+                            formControlName="consigneePhone"
+                            placeholder="+243 XXX XXX XXX"
+                            maxlength="20">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Shipper Address -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="shipperAddress" class="form-label">
+                          <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                          Adresse de l'expéditeur
+                        </label>
+                        <textarea 
+                          id="shipperAddress"
+                          class="form-control"
+                          formControlName="shipperAddress"
+                          placeholder="Adresse complète de l'expéditeur"
+                          rows="3"
+                          maxlength="500"></textarea>
+                      </div>
+                    </div>
+
+                    <!-- Consignee Address -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="consigneeAddress" class="form-label">
+                          <i class="fas fa-map-marker-alt text-info me-2"></i>
+                          Adresse du destinataire
+                        </label>
+                        <textarea 
+                          id="consigneeAddress"
+                          class="form-control"
+                          formControlName="consigneeAddress"
+                          placeholder="Adresse complète du destinataire"
+                          rows="3"
+                          maxlength="500"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 5: Informations supplémentaires et validation -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingAdditional">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapseAdditional" aria-expanded="false" aria-controls="collapseAdditional">
+                  <i class="fas fa-clipboard-check text-danger me-3"></i>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">Informations supplémentaires et validation</span>
+                    <small class="text-muted">Instructions spéciales, valeur déclarée et finalisation</small>
+                  </div>
+                </button>
+              </h2>
+              <div id="collapseAdditional" class="accordion-collapse collapse" 
+                   aria-labelledby="headingAdditional" data-bs-parent="#ltaAccordion">
+                <div class="accordion-body p-4">
+                  <div class="row g-4">
+                    <!-- Special Instructions -->
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="specialInstructions" class="form-label">
+                          <i class="fas fa-clipboard-list text-warning me-2"></i>
+                          Instructions spéciales
+                        </label>
+                        <textarea 
+                          id="specialInstructions"
+                          class="form-control"
+                          formControlName="specialInstructions"
+                          placeholder="Instructions de manutention spéciales..."
+                          rows="4"
+                          maxlength="1000"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <!-- Declared Value -->
+                      <div class="form-group mb-3">
+                        <label for="declaredValue" class="form-label">
+                          <i class="fas fa-dollar-sign text-success me-2"></i>
+                          Valeur déclarée (USD)
+                        </label>
+                        <div class="input-group">
+                          <span class="input-group-text bg-success text-white">$</span>
+                          <input 
+                            type="number"
+                            id="declaredValue"
+                            class="form-control"
+                            formControlName="declaredValue"
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0">
+                          <span class="input-group-text">USD</span>
+                        </div>
+                      </div>
+
+                      <!-- Pickup Date -->
+                      <div class="form-group">
+                        <label for="pickupDate" class="form-label">
+                          <i class="fas fa-calendar-alt text-info me-2"></i>
+                          Date d'enlèvement
+                        </label>
+                        <input 
+                          type="datetime-local"
+                          id="pickupDate"
+                          class="form-control"
+                          formControlName="pickupDate">
+                      </div>
+                    </div>
+
+                    <!-- Individual Packages Section -->
+                    <div class="col-12" *ngIf="packagesFormArray.length > 0">
+                      <div class="card border-secondary">
+                        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                          <h6 class="card-title mb-0">
+                            <i class="bi bi-boxes me-2"></i>
+                            Colis individuels
+                          </h6>
+                          <button 
+                            type="button" 
+                            class="btn btn-sm btn-outline-light"
+                            (click)="addPackage()">
+                            <i class="bi bi-plus me-1"></i>
+                            Ajouter un colis
+                          </button>
+                        </div>
+                        <div class="card-body">
+                          <div formArrayName="packages">
+                            <div 
+                              *ngFor="let package of packagesFormArray.controls; let i = index"
+                              [formGroupName]="i"
+                              class="package-item border rounded p-3 mb-3">
+                              <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Colis {{ i + 1 }}</h6>
+                                <button 
+                                  type="button"
+                                  class="btn btn-sm btn-outline-danger"
+                                  (click)="removePackage(i)">
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </div>
+                              <div class="row g-3">
+                                <div class="col-12 col-md-4">
+                                  <label class="form-label">Poids (kg)</label>
+                                  <input 
+                                    type="number"
+                                    class="form-control"
+                                    formControlName="weight"
+                                    placeholder="0.0"
+                                    step="0.1"
+                                    min="0.1">
+                                </div>
+                                <div class="col-12 col-md-8">
+                                  <label class="form-label">Description</label>
+                                  <input 
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="description"
+                                    placeholder="Description du colis"
+                                    maxlength="200">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="col-12">
+                      <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                          <h6 class="card-title mb-0">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Validation et finalisation
+                          </h6>
+                        </div>
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="form-actions-left">
+                              <button 
+                                type="button"
+                                class="btn btn-outline-secondary me-2"
+                                (click)="addPackage()">
+                                <i class="bi bi-plus me-1"></i>
+                                Ajouter un colis
+                              </button>
+                              <button 
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                (click)="onReset()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>
+                                Réinitialiser
+                              </button>
+                            </div>
+                            
+                            <div class="form-actions-right">
+                              <button 
+                                type="button"
+                                class="btn btn-secondary me-2"
+                                (click)="onCancel()">
+                                <i class="fas fa-times me-1"></i>
+                                Annuler
+                              </button>
+                              <button 
+                                type="submit"
+                                class="btn btn-primary btn-lg"
+                                [disabled]="ltaForm.invalid || loading">
+                                <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+                                <i class="fas fa-check me-1" *ngIf="!loading"></i>
+                                {{ isEditMode ? 'Modifier la LTA' : 'Créer la LTA' }}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- End Accordion -->
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

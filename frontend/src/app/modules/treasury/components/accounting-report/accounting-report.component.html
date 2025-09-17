@@ -1,0 +1,403 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">
+            <i class="fas fa-chart-line"></i>
+            Consultation Comptable
+          </h4>
+        </div>
+        <div class="card-body">
+
+          <!-- Navigation par onglets -->
+          <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link" 
+                 [class.active]="activeTab === 'summary'"
+                 (click)="setActiveTab('summary')"
+                 role="tab">
+                <i class="fas fa-tachometer-alt"></i>
+                Tableau de bord
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" 
+                 [class.active]="activeTab === 'journal'"
+                 (click)="setActiveTab('journal')"
+                 role="tab">
+                <i class="fas fa-book"></i>
+                Journal des écritures
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" 
+                 [class.active]="activeTab === 'accounts'"
+                 (click)="setActiveTab('accounts')"
+                 role="tab">
+                <i class="fas fa-list-alt"></i>
+                Comptes
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" 
+                 [class.active]="activeTab === 'reports'"
+                 (click)="setActiveTab('reports')"
+                 role="tab">
+                <i class="fas fa-chart-bar"></i>
+                Rapports
+              </a>
+            </li>
+          </ul>
+
+          <!-- Contenu des onglets -->
+          <div class="tab-content">
+
+            <!-- Onglet Tableau de bord -->
+            <div *ngIf="activeTab === 'summary'" class="tab-pane active">
+              <div class="row">
+                
+                <!-- Résumé des comptes principaux -->
+                <div class="col-md-8">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Résumé des comptes principaux</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="row" *ngIf="accountsSummary">
+                        <div class="col-md-6 mb-3" *ngFor="let account of accountsSummary.accounts | keyvalue">
+                          <div class="card border-left-primary">
+                            <div class="card-body">
+                              <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                  <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    {{ account.value.number }} - {{ account.value.name }}
+                                  </div>
+                                  <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ formatCurrency(account.value.balance) }}
+                                  </div>
+                                </div>
+                                <div class="col-auto">
+                                  <i class="fas fa-wallet fa-2x text-gray-300"></i>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Rapport de trésorerie -->
+                <div class="col-md-4">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Trésorerie</h5>
+                    </div>
+                    <div class="card-body" *ngIf="treasuryReport">
+                      <div class="mb-3">
+                        <strong>Caisse:</strong> 
+                        <span class="text-success">{{ formatCurrency(treasuryReport.caisseBalance) }}</span>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Banque:</strong> 
+                        <span class="text-info">{{ formatCurrency(treasuryReport.banqueBalance) }}</span>
+                      </div>
+                      <hr>
+                      <div class="mb-3">
+                        <strong>Total trésorerie:</strong> 
+                        <span class="text-primary font-weight-bold">{{ formatCurrency(treasuryReport.totalTreasury) }}</span>
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary" (click)="loadTreasuryReport()">
+                        <i class="fas fa-sync"></i> Actualiser
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Onglet Journal des écritures -->
+            <div *ngIf="activeTab === 'journal'" class="tab-pane active">
+              
+              <!-- Filtres -->
+              <div class="row mb-4">
+                <div class="col-md-4">
+                  <label>Filtrer par type de source:</label>
+                  <select class="form-select" (change)="loadEntriesBySourceType($event.target.value)">
+                    <option value="">Tous les types</option>
+                    <option *ngFor="let type of sourceTypes" [value]="type.value">
+                      {{ type.label }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-8">
+                  <form [formGroup]="periodForm" class="row">
+                    <div class="col-md-4">
+                      <label>Date début:</label>
+                      <input type="date" class="form-control" formControlName="startDate">
+                    </div>
+                    <div class="col-md-4">
+                      <label>Date fin:</label>
+                      <input type="date" class="form-control" formControlName="endDate">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                      <button type="button" class="btn btn-primary" (click)="loadEntriesByPeriod()">
+                        <i class="fas fa-search"></i> Filtrer
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Tableau des écritures -->
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>N° Écriture</th>
+                      <th>Date</th>
+                      <th>Description</th>
+                      <th>Référence</th>
+                      <th>Source</th>
+                      <th>Débit</th>
+                      <th>Crédit</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let entry of journalEntries">
+                      <td>{{ entry.entryNumber }}</td>
+                      <td>{{ entry.entryDate | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ entry.description }}</td>
+                      <td>{{ entry.reference }}</td>
+                      <td>
+                        <span class="badge badge-info">
+                          {{ getSourceTypeLabel(entry.sourceType) }}
+                        </span>
+                      </td>
+                      <td class="text-right">{{ formatCurrency(entry.totalDebit) }}</td>
+                      <td class="text-right">{{ formatCurrency(entry.totalCredit) }}</td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary" 
+                                data-bs-toggle="collapse" 
+                                [attr.data-bs-target]="'#details-' + entry.id">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    <!-- Détails de l'écriture -->
+                    <tr *ngFor="let entry of journalEntries">
+                      <td colspan="8" class="p-0">
+                        <div class="collapse" [id]="'details-' + entry.id">
+                          <div class="card card-body">
+                            <h6>Détail des lignes d'écriture:</h6>
+                            <table class="table table-sm">
+                              <thead>
+                                <tr>
+                                  <th>Compte</th>
+                                  <th>Description</th>
+                                  <th>Débit</th>
+                                  <th>Crédit</th>
+                                  <th>Interprétation</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let line of entry.accountingEntries">
+                                  <td>
+                                    <span class="badge" [class]="getAccountTypeClass(line.account.accountNumber)">
+                                      {{ line.account.accountNumber }}
+                                    </span>
+                                    {{ line.account.accountName }}
+                                  </td>
+                                  <td>{{ line.description }}</td>
+                                  <td class="text-right">{{ formatCurrency(line.debitAmount) }}</td>
+                                  <td class="text-right">{{ formatCurrency(line.creditAmount) }}</td>
+                                  <td>
+                                    <small class="text-muted">{{ interpretMovement(line) }}</small>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Message si aucune écriture -->
+              <div *ngIf="journalEntries.length === 0 && !loading" class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Aucune écriture comptable trouvée</p>
+              </div>
+            </div>
+
+            <!-- Onglet Comptes -->
+            <div *ngIf="activeTab === 'accounts'" class="tab-pane active">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Consultation d'un compte</h5>
+                    </div>
+                    <div class="card-body">
+                      <form [formGroup]="accountForm">
+                        <div class="mb-3">
+                          <label>Numéro de compte:</label>
+                          <input type="text" class="form-control" formControlName="accountNumber" 
+                                 placeholder="Ex: 411, 531, 512...">
+                        </div>
+                        <div class="mb-3">
+                          <label>Date (optionnel):</label>
+                          <input type="date" class="form-control" formControlName="date">
+                        </div>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-primary" (click)="loadAccountBalance()">
+                            <i class="fas fa-calculator"></i> Solde
+                          </button>
+                          <button type="button" class="btn btn-secondary" (click)="loadAccountMovements()">
+                            <i class="fas fa-list"></i> Mouvements
+                          </button>
+                        </div>
+                      </form>
+
+                      <!-- Affichage du solde -->
+                      <div *ngIf="selectedAccountBalance" class="mt-4 p-3 bg-light rounded">
+                        <h6>Solde du compte {{ selectedAccountBalance.accountNumber }}</h6>
+                        <p class="mb-1"><strong>Date:</strong> {{ selectedAccountBalance.date | date:'dd/MM/yyyy' }}</p>
+                        <p class="mb-0">
+                          <strong>Solde:</strong> 
+                          <span class="h5" [class]="selectedAccountBalance.balance >= 0 ? 'text-success' : 'text-danger'">
+                            {{ formatCurrency(selectedAccountBalance.balance) }}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <!-- Mouvements du compte -->
+                  <div class="card" *ngIf="accountMovements.length > 0">
+                    <div class="card-header">
+                      <h5>Mouvements récents</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table table-sm">
+                          <thead>
+                            <tr>
+                              <th>Date</th>
+                              <th>Description</th>
+                              <th>Débit</th>
+                              <th>Crédit</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let movement of accountMovements">
+                              <td>{{ movement.journalEntry?.entryDate | date:'dd/MM/yyyy' }}</td>
+                              <td>{{ movement.description }}</td>
+                              <td class="text-right">{{ formatCurrency(movement.debitAmount) }}</td>
+                              <td class="text-right">{{ formatCurrency(movement.creditAmount) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Onglet Rapports -->
+            <div *ngIf="activeTab === 'reports'" class="tab-pane active">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Rapport des paiements LTA</h5>
+                    </div>
+                    <div class="card-body">
+                      <form [formGroup]="periodForm">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <label>Date début:</label>
+                            <input type="date" class="form-control" formControlName="startDate">
+                          </div>
+                          <div class="col-md-6">
+                            <label>Date fin:</label>
+                            <input type="date" class="form-control" formControlName="endDate">
+                          </div>
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" (click)="loadLTAPaymentReport()">
+                          <i class="fas fa-chart-bar"></i> Générer rapport
+                        </button>
+                      </form>
+
+                      <!-- Affichage du rapport LTA -->
+                      <div *ngIf="ltaPaymentReport" class="mt-4">
+                        <h6>Rapport période: {{ ltaPaymentReport.period }}</h6>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <p><strong>Nombre de paiements:</strong> {{ ltaPaymentReport.totalPayments }}</p>
+                            <p><strong>Montant total:</strong> {{ formatCurrency(ltaPaymentReport.totalAmount) }}</p>
+                          </div>
+                          <div class="col-md-6">
+                            <h6>Répartition par mode:</h6>
+                            <div *ngFor="let payment of ltaPaymentReport.paymentsByMethod | keyvalue">
+                              <small>{{ payment.key }}: {{ formatCurrency(payment.value) }}</small>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h5>Validation équilibre comptable</h5>
+                    </div>
+                    <div class="card-body">
+                      <p class="text-muted">Vérifiez que les débits égalent les crédits sur une période donnée.</p>
+                      <form [formGroup]="periodForm">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <label>Date début:</label>
+                            <input type="date" class="form-control" formControlName="startDate">
+                          </div>
+                          <div class="col-md-6">
+                            <label>Date fin:</label>
+                            <input type="date" class="form-control" formControlName="endDate">
+                          </div>
+                        </div>
+                        <button type="button" class="btn btn-warning mt-3">
+                          <i class="fas fa-balance-scale"></i> Valider équilibre
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Indicateur de chargement -->
+          <div *ngIf="loading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Chargement...</span>
+            </div>
+            <p class="mt-2 text-muted">Chargement des données comptables...</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

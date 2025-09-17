@@ -1,0 +1,115 @@
+<div class="create-manifest-container">
+  <div class="row">
+    <div class="col-12">
+      <div class="page-header mb-4">
+        <h1 class="h3 mb-1">
+          <i class="fas fa-file-export text-primary me-2"></i>
+          Créer un Manifeste d'Expédition
+        </h1>
+        <p class="text-muted">Générer un manifeste pour regrouper les LTA</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-plus-circle me-2"></i>
+            Nouveau Manifeste
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="manifestForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="manifestNumber" class="form-label">
+                  <i class="fas fa-hashtag me-1"></i>
+                  Numéro de Manifeste *
+                </label>
+                <input type="text" 
+                       class="form-control" 
+                       id="manifestNumber"
+                       formControlName="manifestNumber"
+                       placeholder="MAN-2024-001">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="date" class="form-label">
+                  <i class="fas fa-calendar me-1"></i>
+                  Date d'Expédition *
+                </label>
+                <input type="date" 
+                       class="form-control" 
+                       id="date"
+                       formControlName="date">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="destination" class="form-label">
+                  <i class="fas fa-map-marker-alt me-1"></i>
+                  Destination *
+                </label>
+                <select class="form-select" id="destination" formControlName="destination">
+                  <option value="">Sélectionner une destination</option>
+                  <option value="casablanca">Casablanca</option>
+                  <option value="rabat">Rabat</option>
+                  <option value="marrakech">Marrakech</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="driver" class="form-label">
+                  <i class="fas fa-user me-1"></i>
+                  Chauffeur *
+                </label>
+                <input type="text" 
+                       class="form-control" 
+                       id="driver"
+                       formControlName="driver"
+                       placeholder="Nom du chauffeur">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="vehicle" class="form-label">
+                <i class="fas fa-truck me-1"></i>
+                Véhicule *
+              </label>
+              <input type="text" 
+                     class="form-control" 
+                     id="vehicle"
+                     formControlName="vehicle"
+                     placeholder="Immatriculation du véhicule">
+            </div>
+
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>Module en développement:</strong> Cette fonctionnalité sera implémentée pour créer des manifestes d'expédition regroupant plusieurs LTA.
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" 
+                      class="btn btn-outline-secondary" 
+                      (click)="onCancel()"
+                      [disabled]="loading">
+                <i class="fas fa-times me-1"></i>
+                Annuler
+              </button>
+              <button type="submit" 
+                      class="btn btn-primary" 
+                      [disabled]="manifestForm.invalid || loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                <i class="fas fa-save me-1" *ngIf="!loading"></i>
+                {{ loading ? 'Création...' : 'Créer le Manifeste' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

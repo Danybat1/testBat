@@ -1,0 +1,655 @@
+// FreightOps Dark Theme - Anthracite Gray Design
+
+// Dark Theme Root Variables
+:root {
+  --bg-primary: #{$dark-800};
+  --bg-secondary: #{$dark-700};
+  --bg-tertiary: #{$dark-600};
+  --text-primary: #{$dark-100};
+  --text-secondary: #{$dark-300};
+  --text-muted: #{$dark-400};
+  --border-color: #{$dark-600};
+  --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+// Global Dark Theme Styles
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+// Dark Theme Layout
+.app-container {
+  background: var(--bg-primary);
+}
+
+// Enhanced Sidebar for Dark Theme
+.sidebar {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  box-shadow: 4px 0 12px var(--shadow-color);
+  
+  // Sidebar Header
+  .sidebar-header {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    
+    .logo-text {
+      color: var(--text-primary);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    .sidebar-toggle {
+      color: var(--text-secondary);
+      
+      &:hover {
+        color: $primary-400;
+        background: rgba($primary-500, 0.1);
+      }
+    }
+  }
+  
+  // Enhanced Navigation Links
+  .nav-link {
+    color: var(--text-secondary);
+    background: transparent;
+    border-radius: $border-radius;
+    margin: 0.25rem 0.5rem;
+    padding: 0.875rem 1rem;
+    transition: all 0.2s ease;
+    position: relative;
+    font-weight: $font-weight-medium;
+    
+    // Better contrast and visibility
+    &:hover {
+      background: rgba($primary-500, 0.15);
+      color: $primary-300;
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba($primary-500, 0.2);
+    }
+    
+    &.active {
+      background: linear-gradient(135deg, $primary-600 0%, $primary-500 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba($primary-500, 0.4);
+      font-weight: $font-weight-semibold;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 60%;
+        background: white;
+        border-radius: 0 2px 2px 0;
+      }
+    }
+    
+    // Icon styling
+    .nav-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-right: 0.75rem;
+      opacity: 0.8;
+    }
+    
+    &:hover .nav-icon,
+    &.active .nav-icon {
+      opacity: 1;
+    }
+    
+    // Text styling
+    .nav-text {
+      font-size: 0.9rem;
+      
+      @include mobile-only {
+        font-size: 1rem;
+      }
+    }
+  }
+  
+  // Sidebar Footer
+  .sidebar-footer {
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    
+    .btn {
+      color: var(--text-secondary);
+      
+      &:hover {
+        color: $primary-400;
+      }
+    }
+  }
+  
+  // Mobile Responsive Improvements
+  @include mobile-tablet {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 1055 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    pointer-events: auto;
+    background: var(--bg-secondary) !important;
+    
+    &.show {
+      transform: translateX(0) !important;
+      box-shadow: 8px 0 24px var(--shadow-color);
+    }
+    
+    .nav-link {
+      position: relative !important;
+      z-index: 1 !important;
+      padding: 1rem 1.25rem !important;
+      margin: 0.125rem 0.75rem !important;
+      font-size: 1rem !important;
+      pointer-events: auto !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      text-decoration: none !important;
+      border-radius: 0.5rem !important;
+      
+      &:hover {
+        background: rgba($primary-500, 0.15) !important;
+        color: $primary-300 !important;
+        transform: translateX(4px) !important;
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, $primary-600 0%, $primary-500 100%) !important;
+        color: white !important;
+      }
+      
+      .nav-icon {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        margin-right: 1rem !important;
+      }
+      
+      .nav-text {
+        font-size: 1rem !important;
+      }
+    }
+  }
+}
+
+// Enhanced Sidebar Backdrop
+.sidebar-backdrop {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1050 !important;
+  pointer-events: auto !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  
+  &.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+// Main Content Dark Theme
+.main-content {
+  background: var(--bg-primary);
+}
+
+// Header Dark Theme
+.main-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  
+  .page-title {
+    color: var(--text-primary);
+  }
+  
+  // Hamburger menu button styling
+  .btn.text-danger {
+    color: $secondary-500 !important;
+    
+    &:hover {
+      color: $secondary-600 !important;
+      background-color: rgba($secondary-500, 0.1) !important;
+    }
+    
+    &:focus {
+      color: $secondary-600 !important;
+      box-shadow: 0 0 0 0.125rem rgba($secondary-500, 0.25) !important;
+    }
+    
+    &:active {
+      color: $secondary-700 !important;
+      background-color: rgba($secondary-500, 0.2) !important;
+    }
+  }
+  
+  // Dropdown styling for better contrast
+  .dropdown-menu {
+    background: #ffffff;
+    border: 1px solid $neutral-300;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    
+    .dropdown-item {
+      color: $neutral-800;
+      
+      &:hover {
+        background: $primary-50;
+        color: $primary-700;
+      }
+      
+      .text-dark {
+        color: $neutral-800 !important;
+      }
+      
+      .text-muted {
+        color: $neutral-600 !important;
+      }
+    }
+    
+    .dropdown-header {
+      color: $neutral-700;
+      font-weight: $font-weight-semibold;
+    }
+    
+    .dropdown-divider {
+      border-color: $neutral-300;
+    }
+  }
+  
+  // Search Box
+  .search-box {
+    .input-group-text {
+      background: var(--bg-tertiary);
+      border-color: var(--border-color);
+      color: var(--text-secondary);
+    }
+    
+    .form-control {
+      background: var(--bg-tertiary);
+      border-color: var(--border-color);
+      color: var(--text-primary);
+      
+      &::placeholder {
+        color: var(--text-muted);
+      }
+      
+      &:focus {
+        background: var(--bg-tertiary);
+        border-color: $primary-500;
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.125rem rgba($primary-500, 0.25);
+      }
+    }
+  }
+  
+  // Header Buttons
+  .btn-link {
+    color: var(--text-secondary);
+    
+    &:hover {
+      color: $primary-400;
+    }
+  }
+  
+  // Dropdown Menus
+  .dropdown-menu {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px var(--shadow-color);
+    
+    .dropdown-item {
+      color: var(--text-secondary);
+      
+      &:hover {
+        background: rgba($primary-500, 0.1);
+        color: $primary-300;
+      }
+    }
+    
+    .dropdown-header {
+      color: var(--text-primary);
+    }
+    
+    .dropdown-divider {
+      border-color: var(--border-color);
+    }
+  }
+}
+
+// Footer Dark Theme
+.main-footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  
+  .text-primary {
+    color: $primary-400 !important;
+  }
+}
+
+// Cards Dark Theme
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  
+  .card-header {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    
+    &.bg-gradient-primary,
+    &.bg-gradient-secondary {
+      color: white;
+    }
+  }
+  
+  .card-body {
+    color: var(--text-primary);
+  }
+  
+  .card-footer {
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+  }
+}
+
+// Forms Dark Theme
+.form-label {
+  color: var(--text-primary);
+  font-weight: $font-weight-medium;
+  
+  &.required::after {
+    color: $secondary-400;
+  }
+}
+
+.form-control,
+.form-select {
+  background: #ffffff;
+  border-color: var(--border-color);
+  color: $neutral-800; // Dark text for better readability on white background
+  font-weight: $font-weight-normal;
+  
+  &::placeholder {
+    color: $neutral-500; // Medium gray for placeholders
+    font-weight: $font-weight-normal;
+  }
+  
+  &:focus {
+    background: #ffffff;
+    border-color: $primary-500;
+    color: $neutral-800; // Keep dark text on focus
+    box-shadow: 0 0 0 0.125rem rgba($primary-500, 0.25);
+  }
+  
+  &:disabled {
+    background: $neutral-100;
+    color: $neutral-600;
+    border-color: $neutral-300;
+  }
+  
+  // Ensure good contrast for different input states
+  &.is-valid {
+    border-color: $success-500;
+    color: $neutral-800;
+    
+    &:focus {
+      box-shadow: 0 0 0 0.125rem rgba($success-500, 0.25);
+    }
+  }
+  
+  &.is-invalid {
+    border-color: $secondary-500;
+    color: $neutral-800;
+    
+    &:focus {
+      box-shadow: 0 0 0 0.125rem rgba($secondary-500, 0.25);
+    }
+  }
+}
+
+.input-group-text {
+  background: $neutral-200;
+  border-color: var(--border-color);
+  color: $neutral-700;
+  font-weight: $font-weight-medium;
+}
+
+.form-text {
+  color: var(--text-muted);
+}
+
+.invalid-feedback {
+  color: $secondary-400;
+}
+
+.valid-feedback {
+  color: $success-400;
+}
+
+// Tables Dark Theme
+.table {
+  color: var(--text-primary);
+  
+  th {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+  }
+  
+  td {
+    border-color: var(--border-color);
+  }
+  
+  tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  tbody tr:hover {
+    background: rgba($primary-500, 0.1);
+  }
+}
+
+.table-responsive {
+  border: 1px solid var(--border-color);
+}
+
+// Buttons Dark Theme Enhancement
+.btn {
+  &.btn-outline-primary {
+    border-color: $primary-500;
+    color: $primary-400;
+    
+    &:hover {
+      background: $primary-500;
+      border-color: $primary-500;
+      color: white;
+    }
+  }
+  
+  &.btn-outline-secondary {
+    border-color: $secondary-500;
+    color: $secondary-400;
+    
+    &:hover {
+      background: $secondary-500;
+      border-color: $secondary-500;
+      color: white;
+    }
+  }
+}
+
+// Alerts Dark Theme
+.alert {
+  border: 1px solid var(--border-color);
+  
+  &.alert-primary {
+    background: rgba($primary-500, 0.15);
+    color: $primary-300;
+    border-left-color: $primary-500;
+  }
+  
+  &.alert-secondary {
+    background: rgba($secondary-500, 0.15);
+    color: $secondary-300;
+    border-left-color: $secondary-500;
+  }
+  
+  &.alert-success {
+    background: rgba($success-500, 0.15);
+    color: $success-300;
+    border-left-color: $success-500;
+  }
+  
+  &.alert-warning {
+    background: rgba($warning-500, 0.15);
+    color: $warning-300;
+    border-left-color: $warning-500;
+  }
+  
+  &.alert-danger {
+    background: rgba($danger-500, 0.15);
+    color: $danger-300;
+    border-left-color: $danger-500;
+  }
+}
+
+// Badges Dark Theme
+.badge {
+  &.bg-primary { background: $primary-600 !important; }
+  &.bg-secondary { background: $secondary-600 !important; }
+  &.bg-success { background: $success-600 !important; }
+  &.bg-warning { background: $warning-600 !important; color: $neutral-900 !important; }
+  &.bg-danger { background: $danger-600 !important; }
+}
+
+// Modal Dark Theme
+.modal {
+  .modal-content {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid var(--border-color);
+    
+    &:not(.bg-gradient-primary):not(.bg-gradient-secondary) {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+  }
+  
+  .modal-body {
+    color: var(--text-primary);
+  }
+  
+  .modal-footer {
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
+  }
+}
+
+// Scrollbar Dark Theme
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  
+  &:hover {
+    background: $primary-600;
+  }
+}
+
+// Text Colors for Dark Theme
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.text-primary {
+  color: $primary-400 !important;
+}
+
+.text-secondary {
+  color: $secondary-400 !important;
+}
+
+.text-success {
+  color: $success-400 !important;
+}
+
+.text-warning {
+  color: $warning-400 !important;
+}
+
+.text-danger {
+  color: $danger-400 !important;
+}
+
+// Selected client display
+.selected-client {
+  background: $success-50 !important;
+  border-color: $success-200 !important;
+  
+  .text-success {
+    color: $success-700 !important;
+  }
+  
+  .text-muted {
+    color: $neutral-600 !important;
+  }
+}
+
+// Additional form improvements for better readability
+.form-control:not(:focus) {
+  color: $neutral-800 !important;
+}
+
+.form-select option {
+  color: $neutral-800;
+  background: #ffffff;
+}
+
+// Ensure dropdowns have proper contrast
+.dropdown-menu .dropdown-item {
+  color: $neutral-800 !important;
+  
+  &:hover, &:focus {
+    background-color: $primary-50 !important;
+    color: $primary-700 !important;
+  }
+}
+
+// Text areas and other inputs
+textarea.form-control {
+  color: $neutral-800 !important;
+  background: #ffffff !important;
+}
+
+// Input group addons
+.input-group-text {
+  background: $neutral-200 !important;
+  color: $neutral-700 !important;
+  border-color: $neutral-300 !important;
+}

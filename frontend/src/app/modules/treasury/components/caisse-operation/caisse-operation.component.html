@@ -1,0 +1,279 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-cash-register me-2"></i>
+            Nouvelle Opération de Caisse
+          </h4>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="operationForm" (ngSubmit)="onSubmit()" novalidate>
+            
+            <!-- Première ligne : Date, Référence, Type -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="operationDate" class="form-label">
+                  Date de l'opération <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="date" 
+                  id="operationDate"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('operationDate')"
+                  formControlName="operationDate">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('operationDate')">
+                  {{ getFieldError('operationDate') }}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <label for="reference" class="form-label">
+                  Référence <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="reference"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('reference')"
+                  formControlName="reference"
+                  placeholder="Ex: REF-2024-001">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('reference')">
+                  {{ getFieldError('reference') }}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <label for="operationType" class="form-label">
+                  Type d'opération <span class="text-danger">*</span>
+                </label>
+                <select 
+                  id="operationType"
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('operationType')"
+                  formControlName="operationType">
+                  <option value="">Sélectionner...</option>
+                  <option *ngFor="let type of operationTypes" [value]="type.value">
+                    {{ type.label }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('operationType')">
+                  {{ getFieldError('operationType') }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Deuxième ligne : Montant, Devise, Mode de paiement -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="amount" class="form-label">
+                  Montant <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="number" 
+                  id="amount"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('amount')"
+                  formControlName="amount"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('amount')">
+                  {{ getFieldError('amount') }}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <label for="currency" class="form-label">
+                  Devise <span class="text-danger">*</span>
+                </label>
+                <select 
+                  id="currency"
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('currency')"
+                  formControlName="currency">
+                  <option value="">Sélectionner...</option>
+                  <option *ngFor="let currency of currencies" [value]="currency.value">
+                    {{ currency.label }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('currency')">
+                  {{ getFieldError('currency') }}
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <label for="paymentMethod" class="form-label">
+                  Mode de paiement <span class="text-danger">*</span>
+                </label>
+                <select 
+                  id="paymentMethod"
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('paymentMethod')"
+                  formControlName="paymentMethod">
+                  <option value="">Sélectionner...</option>
+                  <option *ngFor="let method of paymentMethods" [value]="method.value">
+                    {{ method.label }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('paymentMethod')">
+                  {{ getFieldError('paymentMethod') }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Troisième ligne : Client/Fournisseur, Nature -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="clientSupplier" class="form-label">
+                  Client / Fournisseur <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="clientSupplier"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('clientSupplier')"
+                  formControlName="clientSupplier"
+                  placeholder="Nom du client ou fournisseur">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('clientSupplier')">
+                  {{ getFieldError('clientSupplier') }}
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="operationNature" class="form-label">
+                  Nature de l'opération <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="operationNature"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('operationNature')"
+                  formControlName="operationNature"
+                  placeholder="Ex: Paiement facture, Remboursement...">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('operationNature')">
+                  {{ getFieldError('operationNature') }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Sélection LTA (affiché uniquement pour encaissement LTA) -->
+            <div class="form-group" *ngIf="showLTASelection">
+              <label for="ltaId" class="form-label">
+                <i class="fas fa-plane"></i>
+                LTA à encaisser *
+              </label>
+              <select 
+                id="ltaId" 
+                class="form-control" 
+                formControlName="ltaId"
+                [class.is-invalid]="isFieldInvalid('ltaId')">
+                <option value="">Sélectionner une LTA</option>
+                <option *ngFor="let lta of unpaidLTAs" [value]="lta.id">
+                  {{ getLTADisplayText(lta) }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="isFieldInvalid('ltaId')">
+                {{ getFieldError('ltaId') }}
+              </div>
+              
+              <!-- Informations sur la LTA sélectionnée -->
+              <div class="alert alert-info mt-2" *ngIf="selectedLTA">
+                <h6><i class="fas fa-info-circle"></i> Détails de la LTA</h6>
+                <div class="row">
+                  <div class="col-md-6">
+                    <strong>Numéro:</strong> {{ selectedLTA.ltaNumber }}<br>
+                    <strong>Trajet:</strong> {{ selectedLTA.originCity?.name }} → {{ selectedLTA.destinationCity?.name }}<br>
+                    <strong>Mode de paiement:</strong> {{ selectedLTA.paymentMode }}
+                  </div>
+                  <div class="col-md-6">
+                    <strong>Coût total:</strong> {{ selectedLTA.calculatedCost | currency:'USD':'symbol':'1.2-2' }}<br>
+                    <strong>Montant restant:</strong> 
+                    <span class="text-danger font-weight-bold">{{ ltaRemainingAmount | currency:'USD':'symbol':'1.2-2' }}</span><br>
+                    <strong>Client:</strong> {{ selectedLTA.client?.name || 'N/A' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cinquième ligne : Pièce justificative (masquée pour encaissement LTA) -->
+            <div class="row mb-3" *ngIf="!showLTASelection">
+              <div class="col-md-6">
+                <label for="fileInput" class="form-label">
+                  Pièce justificative
+                </label>
+                <input 
+                  type="file" 
+                  id="fileInput"
+                  class="form-control"
+                  (change)="onFileSelected($event)"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                <small class="form-text text-muted">
+                  Formats acceptés : PDF, Images, Documents Word
+                </small>
+              </div>
+            </div>
+
+            <!-- Quatrième ligne : Description -->
+            <div class="row mb-3">
+              <div class="col-12">
+                <label for="description" class="form-label">
+                  Description <span class="text-danger">*</span>
+                </label>
+                <textarea 
+                  id="description"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('description')"
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Description détaillée de l'opération..."></textarea>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
+                  {{ getFieldError('description') }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Sixième ligne : Observations -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <label for="observations" class="form-label">
+                  Observations
+                </label>
+                <textarea 
+                  id="observations"
+                  class="form-control"
+                  formControlName="observations"
+                  rows="2"
+                  placeholder="Observations supplémentaires (optionnel)..."></textarea>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="row">
+              <div class="col-12">
+                <div class="d-flex justify-content-end gap-2">
+                  <button 
+                    type="button" 
+                    class="btn btn-secondary"
+                    (click)="onCancel()">
+                    <i class="fas fa-times me-1"></i>
+                    Annuler
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary"
+                    [disabled]="operationForm.invalid">
+                    <i class="fas fa-save me-1"></i>
+                    Enregistrer
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

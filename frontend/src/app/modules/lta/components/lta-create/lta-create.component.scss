@@ -1,0 +1,313 @@
+.lta-create-container {
+  min-height: calc(100vh - 64px);
+  background-color: #f8f9fa;
+  padding: 24px 0;
+}
+
+// Accordion Bootstrap professionnel
+.accordion {
+  .accordion-item {
+    border: none;
+    border-radius: 12px !important;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    
+    .accordion-header {
+      .accordion-button {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 1.5rem 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #495057;
+        box-shadow: none;
+        transition: all 0.3s ease;
+        
+        &:not(.collapsed) {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+          
+          &::after {
+            filter: brightness(0) invert(1);
+          }
+        }
+        
+        &:hover {
+          background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+          color: white;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        &:focus {
+          box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+          border-color: transparent;
+        }
+        
+        i {
+          font-size: 1.2rem;
+          margin-right: 0.5rem;
+        }
+        
+        .d-flex {
+          align-items: flex-start;
+          
+          small {
+            opacity: 0.8;
+            font-weight: 400;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+          }
+        }
+      }
+    }
+    
+    .accordion-collapse {
+      .accordion-body {
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 0 0 12px 12px;
+        
+        .form-group {
+          margin-bottom: 1.5rem;
+          
+          .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            
+            i {
+              margin-right: 0.5rem;
+            }
+            
+            &.required::after {
+              content: ' *';
+              color: #dc3545;
+            }
+          }
+          
+          .input-group {
+            .input-group-text {
+              border: 1px solid #ced4da;
+              font-weight: 500;
+              
+              &.bg-success {
+                border-color: #198754;
+              }
+              
+              &.bg-danger {
+                border-color: #dc3545;
+              }
+              
+              &.bg-primary {
+                border-color: #0d6efd;
+              }
+              
+              &.bg-warning {
+                border-color: #ffc107;
+              }
+              
+              &.bg-info {
+                border-color: #0dcaf0;
+              }
+            }
+            
+            .form-control,
+            .form-select {
+              border: 1px solid #ced4da;
+              transition: all 0.2s ease;
+              
+              &:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+              }
+              
+              &.is-invalid {
+                border-color: #dc3545;
+                
+                &:focus {
+                  border-color: #dc3545;
+                  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+                }
+              }
+            }
+          }
+          
+          .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+          }
+          
+          .invalid-feedback {
+            font-size: 0.875rem;
+            color: #dc3545;
+            margin-top: 0.25rem;
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styles pour les cards intégrées dans l'accordion
+.card {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  
+  .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+    
+    &.bg-primary {
+      background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+      border-color: #0d6efd;
+    }
+    
+    &.bg-secondary {
+      background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+      border-color: #6c757d;
+    }
+  }
+}
+
+// Client dropdown amélioré
+.client-dropdown {
+  .card {
+    border: none;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    
+    .client-item {
+      transition: all 0.2s ease;
+      
+      &:hover,
+      &.active {
+        background-color: #f8f9fa;
+        transform: translateX(4px);
+      }
+      
+      .client-avatar {
+        .rounded-circle {
+          transition: all 0.2s ease;
+        }
+      }
+      
+      &:hover .client-avatar .rounded-circle {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// Cost display amélioré
+.cost-display {
+  background: linear-gradient(135deg, rgba(25, 135, 84, 0.1) 0%, rgba(25, 135, 84, 0.05) 100%) !important;
+  border: 2px solid #198754 !important;
+  
+  .badge {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%) !important;
+    box-shadow: 0 2px 8px rgba(25, 135, 84, 0.3);
+  }
+}
+
+// Package items
+.package-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6 !important;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .lta-create-container {
+    padding: 16px 0;
+  }
+
+  .accordion {
+    .accordion-item {
+      margin-bottom: 0.75rem;
+      
+      .accordion-header {
+        .accordion-button {
+          padding: 1rem 1.5rem;
+          font-size: 1rem;
+          
+          .d-flex small {
+            font-size: 0.8rem;
+          }
+        }
+      }
+      
+      .accordion-collapse {
+        .accordion-body {
+          padding: 1.5rem;
+          
+          .form-group {
+            margin-bottom: 1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .accordion {
+    .accordion-item {
+      .accordion-header {
+        .accordion-button {
+          padding: 0.75rem 1rem;
+          
+          i {
+            font-size: 1rem;
+          }
+        }
+      }
+      
+      .accordion-collapse {
+        .accordion-body {
+          padding: 1rem;
+        }
+      }
+    }
+  }
+}
+
+// Animation pour l'accordion
+.accordion-item {
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Styles pour les selected clients
+.selected-client {
+  background-color: #d1edff !important;
+  border-color: #0d6efd !important;
+  
+  .text-success {
+    color: #198754 !important;
+  }
+}

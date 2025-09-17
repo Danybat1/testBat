@@ -1,0 +1,49 @@
+<!-- Currency Selector Component -->
+<div class="currency-selector">
+  <div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle currency-btn" 
+            type="button" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+      <i class="fas fa-coins me-2"></i>
+      <span class="currency-symbol">{{ getCurrentCurrencyInfo().symbol }}</span>
+      <span class="currency-code">{{ getCurrentCurrencyInfo().code }}</span>
+    </button>
+    
+    <ul class="dropdown-menu currency-dropdown">
+      <li class="dropdown-header">
+        <i class="fas fa-exchange-alt me-2"></i>
+        Choisir la devise
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      
+      <li *ngFor="let currency of supportedCurrencies">
+        <a class="dropdown-item currency-item" 
+           [class.active]="currency === currentCurrency"
+           (click)="selectCurrency(currency)">
+          <div class="currency-info">
+            <span class="currency-symbol">{{ getCurrencyInfo(currency).symbol }}</span>
+            <div class="currency-details">
+              <span class="currency-name">{{ getCurrencyInfo(currency).name }}</span>
+              <small class="currency-code">{{ currency }}</small>
+            </div>
+          </div>
+          <i class="fas fa-check currency-check" *ngIf="currency === currentCurrency"></i>
+        </a>
+      </li>
+      
+      <li><hr class="dropdown-divider"></li>
+      <li>
+        <div class="dropdown-item-text exchange-rates">
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Taux actuels ({{ getCurrentCurrencyInfo().code }})
+          </small>
+          <div class="rate-list" *ngFor="let rate of displayRates">
+            <small>1 {{ rate.from }} = {{ formatRate(rate.rate) }} {{ rate.to }}</small>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

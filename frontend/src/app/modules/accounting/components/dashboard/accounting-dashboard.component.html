@@ -1,0 +1,284 @@
+<div class="accounting-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>Tableau de Bord Comptable</h1>
+    <button mat-raised-button color="primary" (click)="refreshData()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des données comptables...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-button color="primary" (click)="refreshData()">Réessayer</button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error" class="dashboard-content">
+    
+    <!-- KPI Cards -->
+    <div class="kpi-section">
+      <div class="kpi-grid">
+        
+        <!-- Solde Caisse -->
+        <mat-card class="kpi-card cash">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>account_balance_wallet</mat-icon>
+            <mat-card-title>Solde Caisse</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="kpi-value">{{ formatCurrency(stats?.cashBalance || 0) }}</div>
+            <div class="kpi-subtitle">Compte 531</div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Solde Banque -->
+        <mat-card class="kpi-card bank">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>account_balance</mat-icon>
+            <mat-card-title>Solde Banque</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="kpi-value">{{ formatCurrency(stats?.bankBalance || 0) }}</div>
+            <div class="kpi-subtitle">Compte 512</div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Factures Émises -->
+        <mat-card class="kpi-card invoices-issued">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>receipt</mat-icon>
+            <mat-card-title>Factures Émises</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="kpi-value">{{ stats?.totalInvoicesIssued || 0 }}</div>
+            <div class="kpi-subtitle">Ce mois</div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Factures Encaissées -->
+        <mat-card class="kpi-card invoices-collected">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>paid</mat-icon>
+            <mat-card-title>Factures Encaissées</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="kpi-value">{{ stats?.totalInvoicesCollected || 0 }}</div>
+            <div class="kpi-subtitle">Ce mois</div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+
+    <!-- Alertes -->
+    <div class="alerts-section" *ngIf="stats">
+      <mat-card class="alerts-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="warn">warning</mat-icon>
+          <mat-card-title>Alertes Comptables</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="alert-grid">
+            
+            <div class="alert-item" [class.alert-warning]="(stats.pendingEntries || 0) > 0">
+              <mat-icon>edit</mat-icon>
+              <div class="alert-content">
+                <div class="alert-title">Écritures en Brouillon</div>
+                <div class="alert-value">{{ stats.pendingEntries || 0 }}</div>
+              </div>
+            </div>
+
+            <div class="alert-item" [class.alert-error]="(stats.unbalancedEntries || 0) > 0">
+              <mat-icon>balance</mat-icon>
+              <div class="alert-content">
+                <div class="alert-title">Écritures Déséquilibrées</div>
+                <div class="alert-value">{{ stats.unbalancedEntries || 0 }}</div>
+              </div>
+            </div>
+
+            <div class="alert-item">
+              <mat-icon>calendar_today</mat-icon>
+              <div class="alert-content">
+                <div class="alert-title">Exercice Comptable</div>
+                <div class="alert-value">{{ stats.currentFiscalYear || 'N/A' }}</div>
+              </div>
+            </div>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Account Type Summary -->
+    <div class="summary-section">
+      <div class="summary-grid">
+        
+        <!-- Répartition par Type de Compte -->
+        <mat-card class="summary-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>pie_chart</mat-icon>
+            <mat-card-title>Répartition par Type de Compte</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="account-type-list">
+              <div class="account-type-item" *ngFor="let item of accountTypeDisplayData">
+                <div class="type-info">
+                  <div class="type-label">{{ item.label }}</div>
+                  <div class="type-value">{{ formatCurrency(item.balance) }}</div>
+                </div>
+                <div class="type-indicator" [class]="item.cssClass"></div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Statut des Factures -->
+        <mat-card class="summary-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>assessment</mat-icon>
+            <mat-card-title>Statut des Factures</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="invoice-status-list" *ngIf="stats">
+              <div class="status-item issued">
+                <div class="status-info">
+                  <div class="status-label">Factures Émises</div>
+                  <div class="status-value">{{ stats.totalInvoicesIssued || 0 }}</div>
+                </div>
+                <mat-icon>receipt</mat-icon>
+              </div>
+              <div class="status-item collected">
+                <div class="status-info">
+                  <div class="status-label">Factures Encaissées</div>
+                  <div class="status-value">{{ stats.totalInvoicesCollected || 0 }}</div>
+                </div>
+                <mat-icon>paid</mat-icon>
+              </div>
+              <div class="status-item pending">
+                <div class="status-info">
+                  <div class="status-label">En Attente</div>
+                  <div class="status-value">{{ (stats.totalInvoicesIssued - stats.totalInvoicesCollected) || 0 }}</div>
+                </div>
+                <mat-icon>schedule</mat-icon>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Trésorerie -->
+        <mat-card class="summary-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>account_balance_wallet</mat-icon>
+            <mat-card-title>Trésorerie</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="treasury-summary" *ngIf="stats">
+              <div class="treasury-item cash">
+                <div class="treasury-info">
+                  <div class="treasury-label">Caisse (531)</div>
+                  <div class="treasury-value">{{ formatCurrency(stats.cashBalance || 0) }}</div>
+                </div>
+                <mat-icon>account_balance_wallet</mat-icon>
+              </div>
+              <div class="treasury-item bank">
+                <div class="treasury-info">
+                  <div class="treasury-label">Banque (512)</div>
+                  <div class="treasury-value">{{ formatCurrency(stats.bankBalance || 0) }}</div>
+                </div>
+                <mat-icon>account_balance</mat-icon>
+              </div>
+              <div class="treasury-item total">
+                <div class="treasury-info">
+                  <div class="treasury-label">Total Trésorerie</div>
+                  <div class="treasury-value">{{ formatCurrency((stats.cashBalance + stats.bankBalance) || 0) }}</div>
+                </div>
+                <mat-icon>savings</mat-icon>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-section">
+      <mat-card class="quick-actions-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>flash_on</mat-icon>
+          <mat-card-title>Actions Rapides</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="actions-grid">
+            
+            <button mat-raised-button color="primary" routerLink="/accounting/journal-entries">
+              <mat-icon>book</mat-icon>
+              Écritures Comptables
+            </button>
+
+            <button mat-raised-button color="accent" routerLink="/accounting/trial-balance">
+              <mat-icon>account_balance</mat-icon>
+              Balance Comptable
+            </button>
+
+            <button mat-raised-button routerLink="/accounting/chart-of-accounts">
+              <mat-icon>list</mat-icon>
+              Plan Comptable
+            </button>
+
+            <button mat-raised-button routerLink="/accounting/financial-reports">
+              <mat-icon>assessment</mat-icon>
+              Rapports Financiers
+            </button>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Recent Entries -->
+    <div class="recent-entries-section" *ngIf="balanceSummary.length > 0">
+      <mat-card class="recent-entries-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>history</mat-icon>
+          <mat-card-title>Soldes Principaux</mat-card-title>
+          <mat-card-subtitle>Comptes avec soldes significatifs</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="balance-table">
+            <div class="balance-header">
+              <div class="balance-col">Compte</div>
+              <div class="balance-col">Libellé</div>
+              <div class="balance-col">Solde</div>
+            </div>
+            <div class="balance-row" *ngFor="let balance of balanceSummary.slice(0, 8)">
+              <div class="balance-col account-number">{{ balance.accountNumber }}</div>
+              <div class="balance-col account-name">{{ balance.accountName }}</div>
+              <div class="balance-col balance-amount" 
+                   [class.positive]="balance.balance > 0"
+                   [class.negative]="balance.balance < 0">
+                {{ formatCurrency(balance.balance) }}
+              </div>
+            </div>
+          </div>
+          <div class="view-all-link">
+            <a mat-button routerLink="/accounting/trial-balance">
+              Voir la balance complète
+              <mat-icon>arrow_forward</mat-icon>
+            </a>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+</div>

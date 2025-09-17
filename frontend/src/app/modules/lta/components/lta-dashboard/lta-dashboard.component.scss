@@ -1,0 +1,194 @@
+.lta-dashboard {
+  min-height: calc(100vh - 64px);
+  background-color: #f8f9fa;
+  padding: 24px 0;
+}
+
+.stat-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  }
+
+  mat-card-content {
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .stat-icon {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    opacity: 0.3;
+    transform: rotate(-15deg);
+  }
+
+  // Gradient Brouillon - Orange/Rouge
+  &.pending-card {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.8) 0%, rgba(255, 167, 38, 0.8) 100%);
+      z-index: 1;
+    }
+  }
+
+  // Gradient Confirmé - Bleu/Violet
+  &.confirmed-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+      z-index: 1;
+    }
+  }
+
+  // Gradient En Transit - Jaune/Orange
+  &.transit-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    background: linear-gradient(135deg, #ff9a56 0%, #ff6b95 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 154, 86, 0.9) 0%, rgba(255, 107, 149, 0.9) 100%);
+      z-index: 1;
+    }
+  }
+
+  // Gradient Livré - Vert/Turquoise
+  &.delivered-card {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(67, 233, 123, 0.9) 0%, rgba(56, 249, 215, 0.9) 100%);
+      z-index: 1;
+    }
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+    color: white;
+  }
+
+  .stat-label {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .card-title {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+  }
+
+  .card-text small {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+  }
+}
+
+.main-content-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+
+  ::ng-deep mat-card-content {
+    padding: 0 !important;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .lta-dashboard {
+    padding: 16px 0;
+  }
+
+  .stat-card {
+    mat-card-content {
+      padding: 16px !important;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 16px;
+
+    > div:last-child {
+      align-self: stretch;
+
+      button {
+        width: 100%;
+        margin-bottom: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// Animation d'entrée
+.stat-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,243 @@
+<div class="tariff-form-container">
+  <div class="container-fluid">
+    
+    <!-- Loading State -->
+    <div class="loading-container text-center py-5" *ngIf="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Chargement du tarif...</p>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!loading">
+      
+      <!-- Header -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h1 class="h3 mb-1">
+                <i class="bi bi-currency-exchange me-2"></i>
+                {{ isEditMode ? 'Modifier le tarif' : 'Nouveau tarif' }}
+              </h1>
+              <p class="text-muted mb-0">
+                {{ isEditMode ? 'Modifiez les informations du tarif' : 'Créez un nouveau tarif' }}
+              </p>
+            </div>
+            
+            <div>
+              <button 
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="onCancel()">
+                <i class="bi bi-arrow-left me-1"></i>
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <form [formGroup]="tariffForm" (ngSubmit)="onSubmit()" class="tariff-form">
+        
+        <div class="row">
+          
+          <!-- Route Information -->
+          <div class="col-12 col-lg-6 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-route me-2"></i>
+                  Informations de route
+                </h5>
+              </div>
+              <div class="card-body">
+                
+                <div class="mb-3">
+                  <label for="originCityId" class="form-label">Ville d'origine *</label>
+                  <select 
+                    id="originCityId"
+                    class="form-select"
+                    formControlName="originCityId">
+                    <option value="">Sélectionnez une ville</option>
+                    <option *ngFor="let city of cities" [value]="city.id">
+                      {{ city.name }} ({{ city.iataCode }})
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="tariffForm.get('originCityId')?.invalid && tariffForm.get('originCityId')?.touched">
+                    La ville d'origine est requise
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="destinationCityId" class="form-label">Ville de destination *</label>
+                  <select 
+                    id="destinationCityId"
+                    class="form-select"
+                    formControlName="destinationCityId">
+                    <option value="">Sélectionnez une ville</option>
+                    <option *ngFor="let city of cities" [value]="city.id">
+                      {{ city.name }} ({{ city.iataCode }})
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="tariffForm.get('destinationCityId')?.invalid && tariffForm.get('destinationCityId')?.touched">
+                    La ville de destination est requise
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing Information -->
+          <div class="col-12 col-lg-6 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-calculator me-2"></i>
+                  Informations tarifaires
+                </h5>
+              </div>
+              <div class="card-body">
+                
+                <div class="mb-3">
+                  <label for="kgRate" class="form-label">Taux par kilogramme (€) *</label>
+                  <input 
+                    type="number"
+                    id="kgRate"
+                    class="form-control"
+                    formControlName="kgRate"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00">
+                  <div class="invalid-feedback" *ngIf="tariffForm.get('kgRate')?.invalid && tariffForm.get('kgRate')?.touched">
+                    Le taux par kilogramme est requis et doit être positif
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="volumeCoeffV1" class="form-label">Coefficient volume V1</label>
+                  <input 
+                    type="number"
+                    id="volumeCoeffV1"
+                    class="form-control"
+                    formControlName="volumeCoeffV1"
+                    step="0.0001"
+                    min="0"
+                    placeholder="0.0000">
+                </div>
+
+                <div class="mb-3">
+                  <label for="volumeCoeffV2" class="form-label">Coefficient volume V2</label>
+                  <input 
+                    type="number"
+                    id="volumeCoeffV2"
+                    class="form-control"
+                    formControlName="volumeCoeffV2"
+                    step="0.0001"
+                    min="0"
+                    placeholder="0.0000">
+                </div>
+
+                <div class="mb-3">
+                  <label for="volumeCoeffV3" class="form-label">Coefficient volume V3</label>
+                  <input 
+                    type="number"
+                    id="volumeCoeffV3"
+                    class="form-control"
+                    formControlName="volumeCoeffV3"
+                    step="0.0001"
+                    min="0"
+                    placeholder="0.0000">
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Settings -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-gear me-2"></i>
+                  Paramètres supplémentaires
+                </h5>
+              </div>
+              <div class="card-body">
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="effectiveFrom" class="form-label">Date d'effet (début)</label>
+                      <input 
+                        type="date"
+                        id="effectiveFrom"
+                        class="form-control"
+                        formControlName="effectiveFrom">
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="effectiveUntil" class="form-label">Date d'effet (fin)</label>
+                      <input 
+                        type="date"
+                        id="effectiveUntil"
+                        class="form-control"
+                        formControlName="effectiveUntil">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input 
+                      type="checkbox"
+                      id="isActive"
+                      class="form-check-input"
+                      formControlName="isActive">
+                    <label for="isActive" class="form-check-label">
+                      Tarif actif
+                    </label>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-end gap-2">
+              <button 
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="onCancel()">
+                Annuler
+              </button>
+              <button 
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="tariffForm.invalid || submitting">
+                <div class="spinner-border spinner-border-sm me-2" role="status" *ngIf="submitting">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <span *ngIf="!submitting">{{ isEditMode ? 'Mettre à jour' : 'Créer' }}</span>
+                <span *ngIf="submitting">{{ isEditMode ? 'Mise à jour...' : 'Création...' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div> 

@@ -1,0 +1,271 @@
+<div class="journal-entries">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Écritures Comptables</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="refreshData()" [disabled]="loading">
+        <mat-icon>refresh</mat-icon>
+        Actualiser
+      </button>
+      <button mat-raised-button (click)="exportData()">
+        <mat-icon>download</mat-icon>
+        Exporter
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>filter_list</mat-icon>
+      <mat-card-title>Filtres</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filters-form">
+        <div class="filters-grid">
+          
+          <!-- Date Range -->
+          <mat-form-field appearance="outline">
+            <mat-label>Date de début</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date de fin</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Source Type -->
+          <mat-form-field appearance="outline">
+            <mat-label>Type de source</mat-label>
+            <mat-select formControlName="sourceType">
+              <mat-option value="">Tous</mat-option>
+              <mat-option *ngFor="let type of sourceTypes" [value]="type">
+                {{ getSourceTypeLabel(type) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Status -->
+          <mat-form-field appearance="outline">
+            <mat-label>Statut</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="">Tous</mat-option>
+              <mat-option *ngFor="let status of entryStatuses" [value]="status">
+                {{ getStatusLabel(status) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Reference -->
+          <mat-form-field appearance="outline">
+            <mat-label>Référence</mat-label>
+            <input matInput formControlName="reference" placeholder="Numéro de facture, paiement...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Clear Filters -->
+          <div class="filter-actions">
+            <button mat-button type="button" (click)="clearFilters()">
+              <mat-icon>clear</mat-icon>
+              Effacer
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des écritures comptables...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-button color="primary" (click)="refreshData()">Réessayer</button>
+  </div>
+
+  <!-- Data Table -->
+  <mat-card *ngIf="!loading && !error" class="table-card">
+    <mat-card-content>
+      
+      <!-- Table -->
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="journal-entries-table">
+          
+          <!-- Entry Number Column -->
+          <ng-container matColumnDef="entryNumber">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>N° Écriture</th>
+            <td mat-cell *matCellDef="let entry" class="entry-number">
+              {{ entry.entryNumber }}
+            </td>
+          </ng-container>
+
+          <!-- Entry Date Column -->
+          <ng-container matColumnDef="entryDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+            <td mat-cell *matCellDef="let entry">
+              {{ entry.entryDate | date:'dd/MM/yyyy' }}
+            </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let entry" class="description-cell">
+              <div class="description-content">
+                {{ entry.description }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Reference Column -->
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Référence</th>
+            <td mat-cell *matCellDef="let entry">
+              <span *ngIf="entry.reference" class="reference-badge">
+                {{ entry.reference }}
+              </span>
+              <span *ngIf="!entry.reference" class="no-reference">-</span>
+            </td>
+          </ng-container>
+
+          <!-- Source Type Column -->
+          <ng-container matColumnDef="sourceType">
+            <th mat-header-cell *matHeaderCellDef>Source</th>
+            <td mat-cell *matCellDef="let entry">
+              <mat-chip class="source-chip" [class]="'source-' + entry.sourceType.toLowerCase()">
+                {{ getSourceTypeLabel(entry.sourceType) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Total Debit Column -->
+          <ng-container matColumnDef="totalDebit">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="amount-header">Débit</th>
+            <td mat-cell *matCellDef="let entry" class="amount-cell debit">
+              {{ formatCurrency(entry.totalDebit) }}
+            </td>
+          </ng-container>
+
+          <!-- Total Credit Column -->
+          <ng-container matColumnDef="totalCredit">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="amount-header">Crédit</th>
+            <td mat-cell *matCellDef="let entry" class="amount-cell credit">
+              {{ formatCurrency(entry.totalCredit) }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let entry">
+              <mat-chip class="status-chip" [style.background-color]="getStatusColor(entry.status)">
+                {{ getStatusLabel(entry.status) }}
+              </mat-chip>
+              <mat-icon *ngIf="!entry.isBalanced" 
+                       class="unbalanced-icon" 
+                       color="warn" 
+                       matTooltip="Écriture déséquilibrée">
+                warning
+              </mat-icon>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+            <td mat-cell *matCellDef="let entry" class="actions-cell">
+              <button mat-icon-button 
+                      (click)="viewEntry(entry)" 
+                      matTooltip="Voir les détails">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              
+              <button mat-icon-button 
+                      *ngIf="canPost(entry)"
+                      (click)="postEntry(entry)" 
+                      matTooltip="Poster l'écriture"
+                      color="primary">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+              
+              <button mat-icon-button 
+                      *ngIf="canReverse(entry)"
+                      (click)="reverseEntry(entry)" 
+                      matTooltip="Contrepasser l'écriture"
+                      color="warn">
+                <mat-icon>undo</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              class="table-row"
+              [class.unbalanced-row]="!row.isBalanced"
+              (click)="viewEntry(row)"></tr>
+        </table>
+      </div>
+
+      <!-- Paginator -->
+      <mat-paginator 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        showFirstLastButtons
+        aria-label="Sélectionner la page des écritures comptables">
+      </mat-paginator>
+
+      <!-- No Data -->
+      <div *ngIf="dataSource.data.length === 0" class="no-data">
+        <mat-icon>book</mat-icon>
+        <h3>Aucune écriture comptable trouvée</h3>
+        <p>Aucune écriture ne correspond aux critères de recherche.</p>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Summary Card -->
+  <mat-card *ngIf="!loading && !error && dataSource.data.length > 0" class="summary-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>calculate</mat-icon>
+      <mat-card-title>Résumé</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-label">Total Écritures</div>
+          <div class="summary-value">{{ dataSource.data.length }}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Total Débit</div>
+          <div class="summary-value debit">
+            {{ getTotalDebit() }}
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Total Crédit</div>
+          <div class="summary-value credit">
+            {{ getTotalCredit() }}
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Écritures Déséquilibrées</div>
+          <div class="summary-value warning">
+            {{ getUnbalancedCount() }}
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</div>

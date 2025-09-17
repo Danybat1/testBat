@@ -1,0 +1,331 @@
+<div class="financial-reports-container">
+  <!-- Vue liste des rapports -->
+  <div *ngIf="!selectedReport" class="reports-list-view">
+    <div class="header-section">
+      <h2>Rapports Financiers</h2>
+      <div class="period-selector">
+        <mat-form-field appearance="outline">
+          <mat-label>Période</mat-label>
+          <mat-select [(value)]="selectedPeriod" (selectionChange)="onPeriodChange()">
+            <mat-option *ngFor="let period of periods" [value]="period.value">
+              {{ period.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="reports-grid">
+      <div *ngFor="let category of reportCategories" class="category-section">
+        <h3 class="category-title">{{ getCategoryLabel(category) }}</h3>
+        <div class="reports-cards">
+          <mat-card *ngFor="let report of getReportsByCategory(category)" 
+                    class="report-card" 
+                    [ngClass]="{'disabled': !report.isAvailable}"
+                    (click)="selectReport(report)">
+            <mat-card-header>
+              <div class="report-header">
+                <mat-icon class="report-icon" [ngClass]="'category-' + report.category.toLowerCase()">
+                  {{ report.icon }}
+                </mat-icon>
+                <div class="report-info">
+                  <mat-card-title>{{ report.name }}</mat-card-title>
+                  <mat-card-subtitle>{{ report.description }}</mat-card-subtitle>
+                </div>
+              </div>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="report-status">
+                <div *ngIf="report.lastGenerated" class="last-generated">
+                  <mat-icon>schedule</mat-icon>
+                  <span>Dernière génération: {{ report.lastGenerated | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div *ngIf="!report.isAvailable" class="unavailable">
+                  <mat-icon>block</mat-icon>
+                  <span>Non disponible</span>
+                </div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions *ngIf="report.isAvailable">
+              <button mat-button color="primary">
+                <mat-icon>visibility</mat-icon>
+                Générer
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue génération/affichage du rapport -->
+  <div *ngIf="selectedReport" class="report-view">
+    <div class="header-section">
+      <div class="report-info">
+        <button mat-icon-button (click)="goBackToReports()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="report-title">
+          <h2>{{ selectedReport.name }}</h2>
+          <span class="report-period">{{ getPeriodLabel() }}</span>
+        </div>
+      </div>
+      <div class="actions" *ngIf="reportData && !loading">
+        <button mat-raised-button (click)="exportReport('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+        <button mat-raised-button (click)="exportReport('excel')">
+          <mat-icon>table_chart</mat-icon>
+          Excel
+        </button>
+        <button mat-raised-button (click)="printReport()">
+          <mat-icon>print</mat-icon>
+          Imprimer
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Génération du rapport en cours...</p>
+    </div>
+
+    <!-- Contenu du rapport -->
+    <div *ngIf="reportData && !loading" class="report-content">
+      <div class="report-header-info">
+        <h3>{{ reportData.title }}</h3>
+        <div class="report-meta">
+          <span>Période: {{ reportData.period }}</span>
+          <span>Généré le: {{ reportData.generatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+
+      <!-- Bilan comptable -->
+      <div *ngIf="selectedReport.id === 'balance_sheet'" class="balance-sheet-report">
+        <div class="balance-section">
+          <div class="assets-section">
+            <h4>ACTIF</h4>
+            
+            <div class="asset-category">
+              <h5>Actif immobilisé</h5>
+              <table class="report-table">
+                <tbody>
+                  <tr *ngFor="let item of reportData.data.assets.fixed">
+                    <td>{{ item.account }}</td>
+                    <td class="amount">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="subtotal">
+                    <td><strong>Total actif immobilisé</strong></td>
+                    <td class="amount"><strong>{{ getSubtotal(reportData.data.assets.fixed) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="asset-category">
+              <h5>Actif circulant</h5>
+              <table class="report-table">
+                <tbody>
+                  <tr *ngFor="let item of reportData.data.assets.current">
+                    <td>{{ item.account }}</td>
+                    <td class="amount">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="subtotal">
+                    <td><strong>Total actif circulant</strong></td>
+                    <td class="amount"><strong>{{ getSubtotal(reportData.data.assets.current) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="total-section">
+              <table class="report-table">
+                <tfoot>
+                  <tr class="total">
+                    <td><strong>TOTAL ACTIF</strong></td>
+                    <td class="amount"><strong>{{ getTotalAssets() | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="liabilities-section">
+            <h4>PASSIF</h4>
+            
+            <div class="liability-category">
+              <h5>Capitaux propres</h5>
+              <table class="report-table">
+                <tbody>
+                  <tr *ngFor="let item of reportData.data.liabilities.equity">
+                    <td>{{ item.account }}</td>
+                    <td class="amount">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="subtotal">
+                    <td><strong>Total capitaux propres</strong></td>
+                    <td class="amount"><strong>{{ getSubtotal(reportData.data.liabilities.equity) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="liability-category">
+              <h5>Dettes</h5>
+              <table class="report-table">
+                <tbody>
+                  <tr *ngFor="let item of reportData.data.liabilities.current">
+                    <td>{{ item.account }}</td>
+                    <td class="amount">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="subtotal">
+                    <td><strong>Total dettes</strong></td>
+                    <td class="amount"><strong>{{ getSubtotal(reportData.data.liabilities.current) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div class="total-section">
+              <table class="report-table">
+                <tfoot>
+                  <tr class="total">
+                    <td><strong>TOTAL PASSIF</strong></td>
+                    <td class="amount"><strong>{{ getTotalLiabilities() | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compte de résultat -->
+      <div *ngIf="selectedReport.id === 'income_statement'" class="income-statement-report">
+        <div class="income-section">
+          <h4>PRODUITS</h4>
+          <table class="report-table">
+            <tbody>
+              <tr *ngFor="let item of reportData.data.revenue">
+                <td>{{ item.account }}</td>
+                <td class="amount">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="subtotal">
+                <td><strong>Total produits</strong></td>
+                <td class="amount"><strong>{{ getSubtotal(reportData.data.revenue) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="expense-section">
+          <h4>CHARGES</h4>
+          <table class="report-table">
+            <tbody>
+              <tr *ngFor="let item of reportData.data.expenses">
+                <td>{{ item.account }}</td>
+                <td class="amount">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="subtotal">
+                <td><strong>Total charges</strong></td>
+                <td class="amount"><strong>{{ getSubtotal(reportData.data.expenses) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="result-section">
+          <table class="report-table">
+            <tfoot>
+              <tr class="total" [ngClass]="{'profit': reportData.data.netIncome > 0, 'loss': reportData.data.netIncome < 0}">
+                <td><strong>{{ reportData.data.netIncome > 0 ? 'BÉNÉFICE' : 'PERTE' }}</strong></td>
+                <td class="amount"><strong>{{ reportData.data.netIncome | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tableau de flux de trésorerie -->
+      <div *ngIf="selectedReport.id === 'cash_flow'" class="cash-flow-report">
+        <div class="cash-flow-section">
+          <h4>Flux de trésorerie liés aux activités opérationnelles</h4>
+          <table class="report-table">
+            <tbody>
+              <tr *ngFor="let item of reportData.data.operating">
+                <td>{{ item.description }}</td>
+                <td class="amount" [ngClass]="{'negative': item.amount < 0}">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="subtotal">
+                <td><strong>Flux opérationnels nets</strong></td>
+                <td class="amount"><strong>{{ getSubtotal(reportData.data.operating) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="cash-flow-section">
+          <h4>Flux de trésorerie liés aux activités d'investissement</h4>
+          <table class="report-table">
+            <tbody>
+              <tr *ngFor="let item of reportData.data.investing">
+                <td>{{ item.description }}</td>
+                <td class="amount" [ngClass]="{'negative': item.amount < 0}">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="subtotal">
+                <td><strong>Flux d'investissement nets</strong></td>
+                <td class="amount"><strong>{{ getSubtotal(reportData.data.investing) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="cash-flow-section">
+          <h4>Flux de trésorerie liés aux activités de financement</h4>
+          <table class="report-table">
+            <tbody>
+              <tr *ngFor="let item of reportData.data.financing">
+                <td>{{ item.description }}</td>
+                <td class="amount" [ngClass]="{'negative': item.amount < 0}">{{ item.amount | currency:'XOF':'symbol':'1.0-0' }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="subtotal">
+                <td><strong>Flux de financement nets</strong></td>
+                <td class="amount"><strong>{{ getSubtotal(reportData.data.financing) | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="result-section">
+          <table class="report-table">
+            <tfoot>
+              <tr class="total" [ngClass]="{'positive': reportData.data.netCashFlow > 0, 'negative': reportData.data.netCashFlow < 0}">
+                <td><strong>VARIATION NETTE DE TRÉSORERIE</strong></td>
+                <td class="amount"><strong>{{ reportData.data.netCashFlow | currency:'XOF':'symbol':'1.0-0' }}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

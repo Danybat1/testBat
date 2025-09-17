@@ -1,0 +1,785 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="freight_manifest_template" 
+              pageWidth="595" 
+              pageHeight="842" 
+              columnWidth="555" 
+              leftMargin="20" 
+              rightMargin="20" 
+              topMargin="20" 
+              bottomMargin="20">
+
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+
+    <!-- Parameters -->
+    <parameter name="manifestNumber" class="java.lang.String"/>
+    <parameter name="proformaNumber" class="java.lang.String"/>
+    <parameter name="transportMode" class="java.lang.String"/>
+    <parameter name="vehicleReference" class="java.lang.String"/>
+    <parameter name="driverName" class="java.lang.String"/>
+    <parameter name="driverPhone" class="java.lang.String"/>
+    <parameter name="scheduledDeparture" class="java.util.Date"/>
+    <parameter name="scheduledArrival" class="java.util.Date"/>
+    <parameter name="shipperName" class="java.lang.String"/>
+    <parameter name="shipperAddress" class="java.lang.String"/>
+    <parameter name="shipperContact" class="java.lang.String"/>
+    <parameter name="shipperPhone" class="java.lang.String"/>
+    <parameter name="consigneeName" class="java.lang.String"/>
+    <parameter name="consigneeAddress" class="java.lang.String"/>
+    <parameter name="consigneeContact" class="java.lang.String"/>
+    <parameter name="consigneePhone" class="java.lang.String"/>
+    <parameter name="clientName" class="java.lang.String"/>
+    <parameter name="clientReference" class="java.lang.String"/>
+    <parameter name="agentName" class="java.lang.String"/>
+    <parameter name="agentAddress" class="java.lang.String"/>
+    <parameter name="totalWeight" class="java.math.BigDecimal"/>
+    <parameter name="totalVolume" class="java.math.BigDecimal"/>
+    <parameter name="totalPackages" class="java.lang.Integer"/>
+    <parameter name="totalValue" class="java.math.BigDecimal"/>
+    <parameter name="deliveryInstructions" class="java.lang.String"/>
+    <parameter name="generalRemarks" class="java.lang.String"/>
+    <parameter name="status" class="java.lang.String"/>
+    <parameter name="qrCode" class="java.lang.String"/>
+
+    <!-- Fields for items datasource -->
+    <field name="lineNumber" class="java.lang.Integer"/>
+    <field name="trackingNumber" class="java.lang.String"/>
+    <field name="description" class="java.lang.String"/>
+    <field name="packagingType" class="java.lang.String"/>
+    <field name="packageCount" class="java.lang.Integer"/>
+    <field name="grossWeight" class="java.math.BigDecimal"/>
+    <field name="volume" class="java.math.BigDecimal"/>
+    <field name="volumetricWeight" class="java.math.BigDecimal"/>
+    <field name="declaredValue" class="java.math.BigDecimal"/>
+    <field name="containerNumber" class="java.lang.String"/>
+    <field name="remarks" class="java.lang.String"/>
+
+    <!-- Variables -->
+    <variable name="totalWeightSum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{grossWeight}]]></variableExpression>
+    </variable>
+    <variable name="totalVolumeSum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{volume}]]></variableExpression>
+    </variable>
+    <variable name="totalPackagesSum" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{packageCount}]]></variableExpression>
+    </variable>
+    <variable name="totalValueSum" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{declaredValue}]]></variableExpression>
+    </variable>
+
+    <!-- Title Band -->
+    <title>
+        <band height="120" splitType="Stretch">
+            <!-- Company Header -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="60" backcolor="#2563EB"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="20" y="10" width="200" height="25" forecolor="#FFFFFF"/>
+                <textElement>
+                    <font fontName="Arial" size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[FREIGHTOPS]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="20" y="35" width="250" height="15" forecolor="#FFFFFF"/>
+                <textElement>
+                    <font fontName="Arial" size="10"/>
+                </textElement>
+                <text><![CDATA[Solutions Logistiques Intégrées - Douala, Cameroun]]></text>
+            </staticText>
+
+            <!-- Document Title -->
+            <staticText>
+                <reportElement x="350" y="10" width="180" height="20" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[MANIFESTE D'EXPÉDITION]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="350" y="30" width="80" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Multimodal]]></text>
+            </staticText>
+
+            <!-- Manifest Info Box -->
+            <rectangle>
+                <reportElement x="0" y="70" width="555" height="40" backcolor="#F8F9FA"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#DEE2E6"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="75" width="100" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[N° Manifeste:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="110" y="75" width="120" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{manifestNumber}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="250" y="75" width="80" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[N° Proforma:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="330" y="75" width="100" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="10"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{proformaNumber}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="450" y="75" width="40" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Statut:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="490" y="75" width="60" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{status}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="10" y="90" width="60" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <text><![CDATA[Date:]]></text>
+            </staticText>
+            
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement x="70" y="90" width="120" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- Page Header -->
+    <pageHeader>
+        <band height="180" splitType="Stretch">
+            <!-- Transport Information Section -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="80" backcolor="#F8F9FA"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#DEE2E6"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="5" width="535" height="15" forecolor="#2563EB"/>
+                <textElement>
+                    <font fontName="Arial" size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[INFORMATIONS DE TRANSPORT]]></text>
+            </staticText>
+            
+            <!-- Transport Mode and Vehicle -->
+            <staticText>
+                <reportElement x="10" y="25" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Mode de transport:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="110" y="25" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{transportMode}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="230" y="25" width="80" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Véhicule:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="310" y="25" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{vehicleReference}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Driver Information -->
+            <staticText>
+                <reportElement x="10" y="40" width="80" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Conducteur:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="90" y="40" width="120" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{driverName}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="230" y="40" width="60" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Téléphone:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="290" y="40" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{driverPhone}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Schedule Information -->
+            <staticText>
+                <reportElement x="10" y="55" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Départ prévu:]]></text>
+            </staticText>
+            
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement x="110" y="55" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{scheduledDeparture}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="230" y="55" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Arrivée prévue:]]></text>
+            </staticText>
+            
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement x="330" y="55" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{scheduledArrival}]]></textFieldExpression>
+            </textField>
+
+            <!-- Parties Information Section -->
+            <rectangle>
+                <reportElement x="0" y="90" width="555" height="85" backcolor="#FFFFFF"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#DEE2E6"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="95" width="535" height="15" forecolor="#2563EB"/>
+                <textElement>
+                    <font fontName="Arial" size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[PARTIES IMPLIQUÉES]]></text>
+            </staticText>
+            
+            <!-- Shipper and Consignee in two columns -->
+            <staticText>
+                <reportElement x="10" y="115" width="80" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[EXPÉDITEUR:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="10" y="130" width="260" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{shipperName}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="10" y="145" width="260" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{shipperAddress}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="10" y="160" width="260" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Tél: " + $P{shipperPhone}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="285" y="115" width="80" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[DESTINATAIRE:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="285" y="130" width="260" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{consigneeName}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="285" y="145" width="260" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{consigneeAddress}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="285" y="160" width="260" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Tél: " + $P{consigneePhone}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageHeader>
+
+    <!-- Column Header -->
+    <columnHeader>
+        <band height="40" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="25" backcolor="#2563EB"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="5" y="5" width="25" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[N°]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="30" y="5" width="60" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[N° Suivi]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="90" y="5" width="100" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Description]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="190" y="5" width="50" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Emballage]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="240" y="5" width="30" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Nb Colis]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="270" y="5" width="40" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Poids (kg)]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="310" y="5" width="40" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Volume (m³)]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="350" y="5" width="50" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Poids Vol.]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="400" y="5" width="50" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Valeur]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="450" y="5" width="50" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Container]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="500" y="5" width="50" height="15" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Remarques]]></text>
+            </staticText>
+            
+            <!-- Separator line -->
+            <line>
+                <reportElement x="0" y="25" width="555" height="1"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#DEE2E6"/>
+                </graphicElement>
+            </line>
+        </band>
+    </columnHeader>
+
+    <!-- Detail Band -->
+    <detail>
+        <band height="20" splitType="Stretch">
+            <!-- Alternating row background -->
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="20" backcolor="#F8F9FA">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+            
+            <textField>
+                <reportElement x="5" y="3" width="25" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{lineNumber}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="30" y="3" width="60" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{trackingNumber}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="90" y="3" width="100" height="14"/>
+                <textElement>
+                    <font fontName="Arial" size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="190" y="3" width="50" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{packagingType}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="240" y="3" width="30" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{packageCount}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0.00">
+                <reportElement x="270" y="3" width="40" height="14"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{grossWeight}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0.000">
+                <reportElement x="310" y="3" width="40" height="14"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{volume}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0.00">
+                <reportElement x="350" y="3" width="50" height="14"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{volumetricWeight}]]></textFieldExpression>
+            </textField>
+            
+            <textField pattern="#,##0">
+                <reportElement x="400" y="3" width="50" height="14"/>
+                <textElement textAlignment="Right">
+                    <font fontName="Arial" size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{declaredValue}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="450" y="3" width="50" height="14"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{containerNumber}]]></textFieldExpression>
+            </textField>
+            
+            <textField>
+                <reportElement x="500" y="3" width="50" height="14"/>
+                <textElement>
+                    <font fontName="Arial" size="6"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{remarks}]]></textFieldExpression>
+            </textField>
+            
+            <!-- Row separator -->
+            <line>
+                <reportElement x="0" y="19" width="555" height="1"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#E5E7EB"/>
+                </graphicElement>
+            </line>
+        </band>
+    </detail>
+
+    <!-- Summary -->
+    <summary>
+        <band height="200" splitType="Stretch">
+            <!-- Totals Section -->
+            <rectangle>
+                <reportElement x="0" y="10" width="555" height="60" backcolor="#F1F5F9"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#2563EB"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="15" width="535" height="15" forecolor="#2563EB"/>
+                <textElement>
+                    <font fontName="Arial" size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TOTAUX GÉNÉRAUX]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="20" y="35" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total Colis:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="120" y="35" width="60" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{totalPackagesSum}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="200" y="35" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Poids Total:]]></text>
+            </staticText>
+            
+            <textField pattern="#,##0.00 kg">
+                <reportElement x="300" y="35" width="80" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{totalWeightSum}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="20" y="50" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Volume Total:]]></text>
+            </staticText>
+            
+            <textField pattern="#,##0.000 m³">
+                <reportElement x="120" y="50" width="80" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{totalVolumeSum}]]></textFieldExpression>
+            </textField>
+            
+            <staticText>
+                <reportElement x="200" y="50" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Valeur Totale:]]></text>
+            </staticText>
+            
+            <textField pattern="#,##0 XAF">
+                <reportElement x="300" y="50" width="100" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{totalValueSum}]]></textFieldExpression>
+            </textField>
+
+            <!-- Instructions Section -->
+            <rectangle>
+                <reportElement x="0" y="80" width="555" height="40" backcolor="#FFFFFF"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#DEE2E6"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="85" width="150" height="12"/>
+                <textElement>
+                    <font fontName="Arial" size="10" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Instructions de livraison:]]></text>
+            </staticText>
+            
+            <textField>
+                <reportElement x="10" y="100" width="535" height="15"/>
+                <textElement>
+                    <font fontName="Arial" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{deliveryInstructions}]]></textFieldExpression>
+            </textField>
+
+            <!-- Signatures Section -->
+            <rectangle>
+                <reportElement x="0" y="130" width="555" height="60" backcolor="#FFFFFF"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#DEE2E6"/>
+                </graphicElement>
+            </rectangle>
+            
+            <staticText>
+                <reportElement x="10" y="135" width="535" height="15" forecolor="#2563EB"/>
+                <textElement>
+                    <font fontName="Arial" size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[SIGNATURES]]></text>
+            </staticText>
+            
+            <!-- Three signature columns -->
+            <staticText>
+                <reportElement x="20" y="155" width="150" height="12"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[CHARGEMENT]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="200" y="155" width="150" height="12"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[AGENT FREIGHTOPS]]></text>
+            </staticText>
+            
+            <staticText>
+                <reportElement x="380" y="155" width="150" height="12"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[RÉCEPTION/LIVRAISON]]></text>
+            </staticText>
+            
+            <!-- Signature lines -->
+            <line>
+                <reportElement x="20" y="175" width="150" height="1"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#000000"/>
+                </graphicElement>
+            </line>
+            
+            <line>
+                <reportElement x="200" y="175" width="150" height="1"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#000000"/>
+                </graphicElement>
+            </line>
+            
+            <line>
+                <reportElement x="380" y="175" width="150" height="1"/>
+                <graphicElement>
+                    <pen lineWidth="1" lineColor="#000000"/>
+                </graphicElement>
+            </line>
+        </band>
+    </summary>
+
+</jasperReport>

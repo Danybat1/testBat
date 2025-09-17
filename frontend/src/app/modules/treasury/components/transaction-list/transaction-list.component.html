@@ -1,0 +1,243 @@
+<div class="transaction-list">
+  <div class="page-header">
+    <h1>Transactions Trésorerie</h1>
+    <button mat-raised-button color="primary" (click)="createTransaction()">
+      <mat-icon>add</mat-icon>
+      Nouvelle Transaction
+    </button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards" *ngIf="!loading">
+    <mat-card class="summary-card income">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>trending_up</mat-icon>
+          <div class="summary-info">
+            <h3>{{ formatCurrency(getTotalIncome()) }}</h3>
+            <p>Total Recettes</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card expense">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>trending_down</mat-icon>
+          <div class="summary-info">
+            <h3>{{ formatCurrency(getTotalExpense()) }}</h3>
+            <p>Total Dépenses</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card net" [ngClass]="getNetFlow() >= 0 ? 'positive' : 'negative'">
+      <mat-card-content>
+        <div class="summary-content">
+          <mat-icon>{{ getNetFlow() >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          <div class="summary-info">
+            <h3>{{ formatCurrency(getNetFlow()) }}</h3>
+            <p>Flux Net</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" 
+                 placeholder="Référence, description...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Type</mat-label>
+          <mat-select [(value)]="typeFilter" (selectionChange)="onTypeFilterChange()">
+            <mat-option value="all">Tous</mat-option>
+            <mat-option value="INCOME">Recettes</mat-option>
+            <mat-option value="EXPENSE">Dépenses</mat-option>
+            <mat-option value="TRANSFER">Transferts</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Catégorie</mat-label>
+          <mat-select [(value)]="categoryFilter" (selectionChange)="onCategoryFilterChange()">
+            <mat-option value="all">Toutes</mat-option>
+            <mat-option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Du</mat-label>
+          <input matInput type="date" [(ngModel)]="dateFromFilter" (ngModelChange)="onDateFilterChange()">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Au</mat-label>
+          <input matInput type="date" [(ngModel)]="dateToFilter" (ngModelChange)="onDateFilterChange()">
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="exportToExcel()">
+          <mat-icon>file_download</mat-icon>
+          Exporter
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="!loading">
+    <span>{{ filteredTransactions.length }} transaction(s) trouvée(s)</span>
+  </div>
+
+  <!-- Transactions Table -->
+  <mat-card class="table-card" *ngIf="!loading">
+    <div class="table-container">
+      <table mat-table [dataSource]="filteredTransactions" class="transactions-table">
+        <!-- Reference Column -->
+        <ng-container matColumnDef="reference">
+          <th mat-header-cell *matHeaderCellDef>Référence</th>
+          <td mat-cell *matCellDef="let transaction">
+            <code class="reference">{{ transaction.reference }}</code>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div class="type-cell">
+              <mat-icon [color]="getTransactionTypeColor(transaction.type)">
+                {{ getTransactionTypeIcon(transaction.type) }}
+              </mat-icon>
+              <span>{{ getTransactionTypeLabel(transaction.type) }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Amount Column -->
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Montant</th>
+          <td mat-cell *matCellDef="let transaction">
+            <span class="amount" [ngClass]="transaction.type === 'INCOME' ? 'positive' : 'negative'">
+              {{ transaction.type === 'EXPENSE' ? '-' : '+' }}{{ formatCurrency(transaction.amount) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="transactionDate">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let transaction">
+            {{ formatDate(transaction.transactionDate) }}
+          </td>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div class="description-cell">
+              <strong>{{ transaction.description }}</strong>
+              <small *ngIf="transaction.notes">{{ transaction.notes }}</small>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Category Column -->
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef>Catégorie</th>
+          <td mat-cell *matCellDef="let transaction">
+            <mat-chip *ngIf="transaction.category" color="accent" selected>
+              {{ transaction.category }}
+            </mat-chip>
+            <span *ngIf="!transaction.category" class="no-category">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Cash Box Column -->
+        <ng-container matColumnDef="cashBox">
+          <th mat-header-cell *matHeaderCellDef>Caisse</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div *ngIf="transaction.cashBox" class="account-info">
+              <mat-icon>money</mat-icon>
+              <span>{{ transaction.cashBox.name }}</span>
+            </div>
+            <span *ngIf="!transaction.cashBox" class="no-account">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Bank Account Column -->
+        <ng-container matColumnDef="bankAccount">
+          <th mat-header-cell *matHeaderCellDef>Compte Bancaire</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div *ngIf="transaction.bankAccount" class="account-info">
+              <mat-icon>account_balance</mat-icon>
+              <span>{{ transaction.bankAccount.accountName }}</span>
+            </div>
+            <span *ngIf="!transaction.bankAccount" class="no-account">-</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let transaction">
+            <div class="actions-cell">
+              <button mat-icon-button [matMenuTriggerFor]="actionMenu" 
+                      matTooltip="Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              
+              <mat-menu #actionMenu="matMenu">
+                <button mat-menu-item (click)="viewTransaction(transaction)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Voir détails</span>
+                </button>
+                <button mat-menu-item (click)="editTransaction(transaction)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Modifier</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteTransaction(transaction)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  <span>Supprimer</span>
+                </button>
+              </mat-menu>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+            class="table-row" (click)="viewTransaction(row)"></tr>
+      </table>
+
+      <!-- No Data Message -->
+      <div class="no-data" *ngIf="filteredTransactions.length === 0">
+        <mat-icon>receipt</mat-icon>
+        <h3>Aucune transaction trouvée</h3>
+        <p>Aucune transaction ne correspond à vos critères de recherche.</p>
+        <button mat-raised-button color="primary" (click)="createTransaction()">
+          Créer une nouvelle transaction
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des transactions...</p>
+  </div>
+</div>

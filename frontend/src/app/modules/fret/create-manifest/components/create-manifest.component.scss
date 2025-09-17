@@ -1,0 +1,76 @@
+.create-manifest-container {
+  padding: 1rem 0;
+}
+
+.card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  .card-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    
+    .card-title {
+      font-weight: 600;
+    }
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  
+  i {
+    color: #28a745;
+  }
+}
+
+.form-control,
+.form-select {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+  }
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    
+    &:hover {
+      background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.alert-warning {
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.page-header {
+  h1 {
+    color: #2c3e50;
+    font-weight: 700;
+  }
+}

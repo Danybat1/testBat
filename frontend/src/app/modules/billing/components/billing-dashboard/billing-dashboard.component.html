@@ -1,0 +1,225 @@
+<div class="billing-dashboard">
+  <div class="dashboard-header">
+    <h1>Tableau de Bord - Facturation</h1>
+    <p>Vue d'ensemble de votre activité de facturation</p>
+  </div>
+
+  <div class="stats-grid" *ngIf="!loading">
+    <!-- Statistics Cards -->
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">receipt</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.totalInvoices }}</h3>
+            <p>Factures totales</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">description</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.totalQuotes }}</h3>
+            <p>Devis totaux</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card success">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">attach_money</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.totalPaidAmount) }}</h3>
+            <p>Montant encaissé</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">schedule</mat-icon>
+          <div class="stat-info">
+            <h3>{{ formatCurrency(stats.totalRemainingAmount) }}</h3>
+            <p>Montant en attente</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card danger">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">warning</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.overdueInvoices }}</h3>
+            <p>Factures en retard</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card info">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon">payment</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.recentPayments }}</h3>
+            <p>Paiements ce mois</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="content-grid" *ngIf="!loading">
+    <!-- Recent Invoices -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>Factures récentes</mat-card-title>
+        <button mat-button routerLink="/billing/invoices">
+          <mat-icon>arrow_forward</mat-icon>
+          Voir tout
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let invoice of recentInvoices">
+            <div class="item-info">
+              <h4>{{ invoice.invoiceNumber }}</h4>
+              <p>{{ invoice.client?.name }} - {{ formatDate(invoice.invoiceDate) }}</p>
+            </div>
+            <div class="item-status">
+              <mat-chip [color]="getStatusColor(invoice.status)" selected>
+                {{ invoice.status }}
+              </mat-chip>
+              <span class="amount">{{ formatCurrency(invoice.totalAmount) }}</span>
+            </div>
+          </div>
+          <div *ngIf="recentInvoices.length === 0" class="no-data">
+            Aucune facture récente
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Quotes -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>Devis récents</mat-card-title>
+        <button mat-button routerLink="/billing/quotes">
+          <mat-icon>arrow_forward</mat-icon>
+          Voir tout
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let quote of recentQuotes">
+            <div class="item-info">
+              <h4>{{ quote.quoteNumber }}</h4>
+              <p>{{ quote.client?.name }} - {{ formatDate(quote.quoteDate) }}</p>
+            </div>
+            <div class="item-status">
+              <mat-chip [color]="getStatusColor(quote.status)" selected>
+                {{ quote.status }}
+              </mat-chip>
+              <span class="amount">{{ formatCurrency(quote.totalAmount) }}</span>
+            </div>
+          </div>
+          <div *ngIf="recentQuotes.length === 0" class="no-data">
+            Aucun devis récent
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Overdue Invoices -->
+    <mat-card class="content-card" *ngIf="overdueInvoices.length > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="warning-icon">warning</mat-icon>
+          Factures en retard
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item overdue" *ngFor="let invoice of overdueInvoices">
+            <div class="item-info">
+              <h4>{{ invoice.invoiceNumber }}</h4>
+              <p>{{ invoice.client?.name }} - Échéance: {{ formatDate(invoice.dueDate) }}</p>
+            </div>
+            <div class="item-status">
+              <span class="amount danger">{{ formatCurrency(invoice.remainingAmount) }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Payments -->
+    <mat-card class="content-card">
+      <mat-card-header>
+        <mat-card-title>Paiements récents</mat-card-title>
+        <button mat-button routerLink="/billing/payments">
+          <mat-icon>arrow_forward</mat-icon>
+          Voir tout
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="list-container">
+          <div class="list-item" *ngFor="let payment of recentPayments">
+            <div class="item-info">
+              <h4>{{ payment.invoice?.invoiceNumber }}</h4>
+              <p>{{ payment.paymentMethod }} - {{ formatDate(payment.paymentDate) }}</p>
+            </div>
+            <div class="item-status">
+              <mat-chip [color]="getStatusColor(payment.status)" selected>
+                {{ payment.status }}
+              </mat-chip>
+              <span class="amount success">{{ formatCurrency(payment.amount) }}</span>
+            </div>
+          </div>
+          <div *ngIf="recentPayments.length === 0" class="no-data">
+            Aucun paiement récent
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" *ngIf="!loading">
+    <h2>Actions rapides</h2>
+    <div class="actions-grid">
+      <button mat-raised-button color="primary" routerLink="/billing/invoice/create">
+        <mat-icon>add</mat-icon>
+        Nouvelle facture
+      </button>
+      <button mat-raised-button color="accent" routerLink="/billing/quotes/new">
+        <mat-icon>add</mat-icon>
+        Nouveau devis
+      </button>
+      <button mat-raised-button routerLink="/billing/invoices" [queryParams]="{status: 'OVERDUE'}">
+        <mat-icon>warning</mat-icon>
+        Factures en retard
+      </button>
+      <button mat-raised-button routerLink="/billing/quotes" [queryParams]="{expired: true}">
+        <mat-icon>schedule</mat-icon>
+        Devis expirés
+      </button>
+    </div>
+  </div>
+</div>

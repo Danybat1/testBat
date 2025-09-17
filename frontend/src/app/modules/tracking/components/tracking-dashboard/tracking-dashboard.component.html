@@ -1,0 +1,155 @@
+<div class="tracking-dashboard-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-geo-alt-fill"></i>
+      Suivi des Expéditions
+    </h2>
+  </div>
+
+  <div class="search-section">
+    <div class="search-container">
+      <h3 class="search-title">Rechercher une expédition</h3>
+      <div class="search-form">
+        <div class="search-input-group">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Entrez le numéro de suivi ou le numéro LTA"
+            class="search-input"
+            (keyup.enter)="onSearch()">
+          <button
+            class="search-btn"
+            (click)="onSearch()"
+            [disabled]="!searchTerm.trim() || loading">
+            <i class="bi bi-search" *ngIf="!loading"></i>
+            <i class="bi bi-arrow-clockwise spin" *ngIf="loading"></i>
+            {{ loading ? 'Recherche...' : 'Rechercher' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert alert-danger" *ngIf="error && searched && !loading">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error }}
+  </div>
+
+  <!-- Tracking Results -->
+  <div class="results-section" *ngIf="searched && !loading && !error">
+    <div class="tracking-card" *ngIf="trackingInfo">
+      <div class="card-header">
+        <div class="header-info">
+          <h3 class="lta-number">{{ trackingInfo.ltaNumber }}</h3>
+          <p class="tracking-number" *ngIf="trackingInfo.trackingNumber">
+            <small class="text-muted">Suivi: {{ trackingInfo.trackingNumber }}</small>
+          </p>
+        </div>
+        <span class="status-badge" [class]="getStatusClass(trackingInfo.status)">
+          {{ getStatusLabel(trackingInfo.status) }}
+        </span>
+      </div>
+
+      <div class="card-content">
+        <!-- Route Information -->
+        <div class="route-section">
+          <div class="route-point origin">
+            <div class="route-icon">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="route-info">
+              <div class="route-label">Origine</div>
+              <div class="route-value">{{ trackingInfo.originCity.name || 'N/A' }}</div>
+              <div class="shipper-info" *ngIf="trackingInfo.shipperName">
+                <small class="text-muted">{{ trackingInfo.shipperName }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="route-line">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getProgressPercentage(trackingInfo.status)"></div>
+            </div>
+            <div class="progress-text">{{ getProgressPercentage(trackingInfo.status) }}%</div>
+          </div>
+
+          <div class="route-point destination">
+            <div class="route-icon">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div class="route-info">
+              <div class="route-label">Destination</div>
+              <div class="route-value">{{ trackingInfo.destinationCity.name || 'N/A' }}</div>
+              <div class="consignee-info" *ngIf="trackingInfo.consigneeName">
+                <small class="text-muted">{{ trackingInfo.consigneeName }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package Information -->
+        <div class="package-section">
+          <div class="package-item">
+            <i class="bi bi-box"></i>
+            <div class="package-content">
+              <div class="package-label">Colis</div>
+              <div class="package-value">{{ trackingInfo.packageCount }} colis - {{ trackingInfo.totalWeight }}kg</div>
+              <div class="package-nature" *ngIf="trackingInfo.packageNature">
+                <small class="text-muted">{{ trackingInfo.packageNature }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="package-item" *ngIf="trackingInfo.calculatedCost">
+            <i class="bi bi-currency-dollar"></i>
+            <div class="package-content">
+              <div class="package-label">Coût</div>
+              <div class="package-value">${{ trackingInfo.calculatedCost | number:'1.2-2' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates Information -->
+        <div class="dates-section" *ngIf="trackingInfo.pickupDate || trackingInfo.deliveryDate">
+          <div class="date-item" *ngIf="trackingInfo.pickupDate">
+            <i class="bi bi-calendar-check"></i>
+            <div class="date-content">
+              <div class="date-label">Date d'enlèvement</div>
+              <div class="date-value">{{ trackingInfo.pickupDate | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+
+          <div class="date-item" *ngIf="trackingInfo.deliveryDate">
+            <i class="bi bi-calendar-event"></i>
+            <div class="date-content">
+              <div class="date-label">Date de livraison prévue</div>
+              <div class="date-value">{{ trackingInfo.deliveryDate | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Special Instructions -->
+        <div class="instructions-section" *ngIf="trackingInfo.specialInstructions">
+          <h4 class="instructions-title">
+            <i class="bi bi-info-circle me-2"></i>
+            Instructions spéciales
+          </h4>
+          <p class="instructions-text">{{ trackingInfo.specialInstructions }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="no-results" *ngIf="!trackingInfo && !error">
+      <i class="bi bi-exclamation-triangle"></i>
+      <h3>Aucune expédition trouvée</h3>
+      <p>Le numéro "{{ searchTerm }}" n'a pas été trouvé dans notre système.</p>
+      <p>Veuillez vérifier le numéro et réessayer.</p>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Recherche en cours...</p>
+  </div>
+</div>

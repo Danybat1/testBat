@@ -1,0 +1,152 @@
+<div class="report-dashboard-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-graph-up"></i>
+      Rapports et Statistiques
+    </h2>
+    <div class="header-actions">
+      <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange()" class="period-select">
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois</option>
+        <option value="quarter">Ce trimestre</option>
+        <option value="year">Cette année</option>
+      </select>
+      <div class="export-buttons">
+        <button class="btn btn-outline-primary" (click)="exportReport('pdf')">
+          <i class="bi bi-file-earmark-pdf"></i>
+          PDF
+        </button>
+        <button class="btn btn-outline-success" (click)="exportReport('excel')">
+          <i class="bi bi-file-earmark-excel"></i>
+          Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content" *ngIf="!loading">
+    <!-- Key Metrics Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon">
+          <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ reportData.totalLTAs }}</div>
+          <div class="metric-label">Total LTAs</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon active">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ reportData.activeLTAs }}</div>
+          <div class="metric-label">LTAs Actives</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon clients">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ reportData.totalClients }}</div>
+          <div class="metric-label">Clients</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon revenue">
+          <i class="bi bi-currency-euro"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-value">{{ (reportData.totalRevenue / 1000000) | number:'1.1-1' }}M</div>
+          <div class="metric-label">Chiffre d'affaires</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="bi bi-bar-chart"></i>
+          Évolution mensuelle
+        </h3>
+        <div class="chart-placeholder">
+          <div class="chart-bars">
+            <div class="bar" *ngFor="let stat of reportData.monthlyStats" 
+                 [style.height.%]="(stat.count / 200) * 100">
+              <div class="bar-label">{{ stat.month }}</div>
+              <div class="bar-value">{{ stat.count }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="bi bi-pie-chart"></i>
+          Répartition par statut
+        </h3>
+        <div class="chart-placeholder">
+          <div class="pie-chart-mock">
+            <div class="pie-segment active" style="--percentage: 35%">
+              <span class="pie-label">Actives (35%)</span>
+            </div>
+            <div class="pie-segment delivered" style="--percentage: 45%">
+              <span class="pie-label">Livrées (45%)</span>
+            </div>
+            <div class="pie-segment pending" style="--percentage: 20%">
+              <span class="pie-label">En attente (20%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <h3 class="section-title">
+        <i class="bi bi-activity"></i>
+        Activité récente
+      </h3>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="bi bi-plus-circle text-success"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-text">Nouvelle LTA créée - LTA-2024-001234</div>
+            <div class="activity-time">Il y a 2 heures</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="bi bi-check-circle text-primary"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-text">LTA-2024-001230 livrée avec succès</div>
+            <div class="activity-time">Il y a 4 heures</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="bi bi-person-plus text-info"></i>
+          </div>
+          <div class="activity-content">
+            <div class="activity-text">Nouveau client ajouté - Transport Express SARL</div>
+            <div class="activity-time">Il y a 6 heures</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Chargement des rapports...</p>
+  </div>
+</div>

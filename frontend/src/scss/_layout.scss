@@ -1,0 +1,367 @@
+// FreightOps Layout Styles - Responsive Design System
+
+// App Container
+.app-container {
+  min-height: 100vh;
+  background: $neutral-50;
+}
+
+// Sidebar Backdrop for Mobile
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba($neutral-900, 0.5);
+  z-index: $zindex-modal-backdrop;
+  opacity: 0;
+  visibility: hidden;
+  transition: $transition-base;
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// Sidebar Navigation
+.sidebar {
+  width: $sidebar-width;
+  background: white;
+  box-shadow: $box-shadow-lg;
+  z-index: $zindex-modal;
+  transition: all 0.3s ease;
+  
+  @include mobile-tablet {
+    position: fixed;
+    top: 0;
+    left: -$sidebar-width;
+    height: 100vh;
+    z-index: $zindex-modal;
+    transform: translateX(0);
+    
+    &.show {
+      left: 0;
+      transform: translateX(0);
+    }
+    
+    // Ensure nav links are clickable
+    .nav-link {
+      position: relative;
+      z-index: 1;
+      pointer-events: auto;
+      display: flex !important;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      margin: 0.125rem 0.75rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+      }
+      
+      &.active {
+        background-color: #0d6efd;
+        color: white;
+      }
+    }
+  }
+  
+  @include desktop-only {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    
+    &.collapsed {
+      width: $sidebar-collapsed-width;
+    }
+  }
+  
+  // Sidebar Header
+  .sidebar-header {
+    min-height: 4rem;
+    border-bottom: 1px solid $neutral-200;
+    
+    .logo-container {
+      .logo-text {
+        font-size: 1.25rem;
+        
+        @include mobile-only {
+          font-size: 1.125rem;
+        }
+      }
+    }
+    
+    .sidebar-toggle {
+      color: $neutral-600;
+      
+      &:hover {
+        color: $primary-500;
+      }
+    }
+  }
+  
+  // Sidebar Content
+  .sidebar-content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    // Custom scrollbar for sidebar
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: $neutral-300;
+      border-radius: 2px;
+      
+      &:hover {
+        background: $neutral-400;
+      }
+    }
+  }
+  
+  // Navigation Links
+  .nav-link {
+    color: $neutral-600;
+    border-radius: $border-radius;
+    padding: 0.75rem 1rem;
+    margin: 0.125rem 0;
+    transition: $transition-base;
+    position: relative;
+    
+    @include mobile-only {
+      padding: 1rem;
+      margin: 0.25rem 0;
+    }
+    
+    &:hover {
+      background: $primary-50;
+      color: $primary-600;
+      transform: translateX(4px);
+      
+      @include mobile-only {
+        transform: none;
+      }
+    }
+    
+    &.active {
+      @include gradient-primary;
+      color: white;
+      box-shadow: $box-shadow;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: white;
+        border-radius: 0 2px 2px 0;
+      }
+    }
+    
+    .nav-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      flex-shrink: 0;
+    }
+    
+    .nav-text {
+      font-weight: $font-weight-medium;
+      
+      @include mobile-only {
+        font-size: $font-size-base;
+      }
+    }
+  }
+  
+  // Sidebar Footer
+  .sidebar-footer {
+    border-color: $neutral-200;
+    
+    .btn {
+      color: $neutral-500;
+      
+      &:hover {
+        color: $primary-500;
+      }
+    }
+  }
+}
+
+// Main Content Area
+.main-content {
+  min-height: 100vh;
+  
+  @include desktop-only {
+    .sidebar.collapsed + & {
+      margin-left: 0;
+    }
+  }
+}
+
+// Main Header
+.main-header {
+  min-height: 4rem;
+  position: sticky;
+  top: 0;
+  z-index: $zindex-sticky;
+  backdrop-filter: blur(10px);
+  
+  .page-title {
+    color: $neutral-800;
+    font-weight: $font-weight-semibold;
+    
+    @include mobile-only {
+      font-size: 1.125rem;
+    }
+  }
+  
+  // Search Box
+  .search-box {
+    .input-group {
+      .input-group-text {
+        border-color: $neutral-200;
+      }
+      
+      .form-control {
+        border-color: $neutral-200;
+        
+        &:focus {
+          border-color: $primary-500;
+          box-shadow: none;
+          
+          + .input-group-text {
+            border-color: $primary-500;
+          }
+        }
+      }
+    }
+  }
+  
+  // Header Buttons
+  .btn-link {
+    color: $neutral-600;
+    
+    &:hover {
+      color: $primary-500;
+    }
+  }
+  
+  // Notification Badge
+  .badge {
+    font-size: 0.625rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// Page Content
+.page-content {
+  background: $neutral-50;
+  
+  @include mobile-only {
+    padding: 1rem !important;
+  }
+}
+
+// Main Footer
+.main-footer {
+  background: $neutral-100;
+  border-color: $neutral-200;
+  
+  @include mobile-only {
+    text-align: center;
+    
+    .col-12:first-child {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+// Responsive Utilities for Layout
+@include mobile-only {
+  .sidebar {
+    &:not(.show) {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .main-header {
+    .row > div {
+      &:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
+@include tablet-only {
+  .sidebar {
+    width: calc(#{$sidebar-width} - 2rem);
+  }
+}
+
+// Animation for sidebar toggle
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+// Focus states for accessibility
+.sidebar .nav-link:focus-visible,
+.main-header .btn:focus-visible {
+  outline: 2px solid $primary-500;
+  outline-offset: 2px;
+}
+
+// High contrast mode adjustments
+@media (prefers-contrast: high) {
+  .sidebar {
+    border-right: 2px solid $neutral-400;
+    
+    .nav-link {
+      border: 1px solid transparent;
+      
+      &:hover {
+        border-color: $primary-500;
+      }
+      
+      &.active {
+        border-color: white;
+      }
+    }
+  }
+  
+  .main-header {
+    border-bottom-width: 2px;
+  }
+}

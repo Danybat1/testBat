@@ -1,0 +1,25 @@
+<div 
+  [class]="getDisplayClasses()" 
+  [title]="getTooltipTitle()"
+  [attr.data-bs-toggle]="isConverted && showOriginal ? 'tooltip' : null">
+  
+  <!-- Montant principal affiché -->
+  <span class="currency-display__amount">
+    {{ displayAmount }}
+  </span>
+  
+  <!-- Indicateur de conversion -->
+  <span 
+    *ngIf="isConverted && showConversion" 
+    class="currency-display__conversion-indicator"
+    title="Montant converti">
+    <i class="fas fa-exchange-alt"></i>
+  </span>
+  
+  <!-- Montant original (optionnel) -->
+  <small 
+    *ngIf="isConverted && showOriginal" 
+    class="currency-display__original">
+    ({{ originalAmount }})
+  </small>
+</div>

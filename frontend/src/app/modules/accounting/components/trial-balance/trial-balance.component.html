@@ -1,0 +1,106 @@
+<div class="trial-balance-container">
+  <div class="header-section">
+    <h2>Balance Comptable</h2>
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="loadTrialBalance()">
+        <mat-icon>refresh</mat-icon>
+        Actualiser
+      </button>
+      <button mat-raised-button (click)="exportToExcel()">
+        <mat-icon>file_download</mat-icon>
+        Exporter Excel
+      </button>
+      <button mat-raised-button (click)="printBalance()">
+        <mat-icon>print</mat-icon>
+        Imprimer
+      </button>
+    </div>
+  </div>
+
+  <div class="balance-status" [ngClass]="{'balanced': isBalanced, 'unbalanced': !isBalanced}">
+    <mat-icon>{{ isBalanced ? 'check_circle' : 'error' }}</mat-icon>
+    <span>{{ isBalanced ? 'Balance équilibrée' : 'Balance déséquilibrée' }}</span>
+  </div>
+
+  <div class="table-container" *ngIf="!loading">
+    <table mat-table [dataSource]="accounts" class="trial-balance-table">
+      
+      <!-- Code du compte -->
+      <ng-container matColumnDef="accountCode">
+        <th mat-header-cell *matHeaderCellDef>Code</th>
+        <td mat-cell *matCellDef="let account">{{ account.accountCode }}</td>
+        <td mat-footer-cell *matFooterCellDef><strong>TOTAUX</strong></td>
+      </ng-container>
+
+      <!-- Nom du compte -->
+      <ng-container matColumnDef="accountName">
+        <th mat-header-cell *matHeaderCellDef>Nom du compte</th>
+        <td mat-cell *matCellDef="let account">{{ account.accountName }}</td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Solde débiteur -->
+      <ng-container matColumnDef="debitBalance">
+        <th mat-header-cell *matHeaderCellDef class="amount-column">Débit</th>
+        <td mat-cell *matCellDef="let account" class="amount-column">
+          <span *ngIf="account.debitBalance > 0">{{ account.debitBalance | currency:'XOF':'symbol':'1.0-0' }}</span>
+        </td>
+        <td mat-footer-cell *matFooterCellDef class="amount-column total-cell">
+          <strong>{{ totalDebits | currency:'XOF':'symbol':'1.0-0' }}</strong>
+        </td>
+      </ng-container>
+
+      <!-- Solde créditeur -->
+      <ng-container matColumnDef="creditBalance">
+        <th mat-header-cell *matHeaderCellDef class="amount-column">Crédit</th>
+        <td mat-cell *matCellDef="let account" class="amount-column">
+          <span *ngIf="account.creditBalance > 0">{{ account.creditBalance | currency:'XOF':'symbol':'1.0-0' }}</span>
+        </td>
+        <td mat-footer-cell *matFooterCellDef class="amount-column total-cell">
+          <strong>{{ totalCredits | currency:'XOF':'symbol':'1.0-0' }}</strong>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+          [ngClass]="'account-type-' + row.accountType.toLowerCase()"></tr>
+      <tr mat-footer-row *matFooterRowDef="displayedColumns" class="totals-row"></tr>
+    </table>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement de la balance comptable...</p>
+  </div>
+
+  <div class="summary-cards" *ngIf="!loading">
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Total Débits</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount debit">{{ totalDebits | currency:'XOF':'symbol':'1.0-0' }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Total Crédits</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount credit">{{ totalCredits | currency:'XOF':'symbol':'1.0-0' }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>Différence</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="amount" [ngClass]="{'balanced': isBalanced, 'unbalanced': !isBalanced}">
+          {{ (totalDebits - totalCredits) | currency:'XOF':'symbol':'1.0-0' }}
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,423 @@
+<div class="admin-tracking-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="page-title">
+            <i class="fas fa-shipping-fast"></i>
+            Gestion des Colis
+          </h1>
+          <p class="page-subtitle">Interface administrateur pour le suivi et la gestion des expéditions</p>
+        </div>
+        <div class="col-md-6 text-end">
+          <button mat-raised-button color="primary" (click)="onCreateShipment()" [disabled]="loading">
+            <i class="fas fa-plus"></i>
+            Nouveau Colis
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="statistics-section" *ngIf="statistics">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+          <div class="stat-card total">
+            <div class="stat-icon">
+              <i class="fas fa-boxes"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ statistics.total }}</div>
+              <div class="stat-label">Total Colis</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+          <div class="stat-card pending">
+            <div class="stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ statistics.byStatus['PENDING'] || 0 }}</div>
+              <div class="stat-label">En Attente</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+          <div class="stat-card transit">
+            <div class="stat-icon">
+              <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ statistics.inTransit }}</div>
+              <div class="stat-label">En Transit</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+          <div class="stat-card delivered">
+            <div class="stat-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ statistics.byStatus['DELIVERED'] || 0 }}</div>
+              <div class="stat-label">Livrés</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="search-section">
+    <div class="container-fluid">
+      <mat-card class="search-card">
+        <mat-card-header>
+          <mat-card-title>
+            <i class="fas fa-search"></i>
+            Recherche et Filtres
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+            <div class="row">
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>N° de Suivi</mat-label>
+                  <input matInput formControlName="trackingNumber" placeholder="Entrez le numéro">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Expéditeur</mat-label>
+                  <input matInput formControlName="senderName" placeholder="Nom de l'expéditeur">
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Destinataire</mat-label>
+                  <input matInput formControlName="recipientName" placeholder="Nom du destinataire">
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Statut</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option value="">Tous les statuts</mat-option>
+                    <mat-option *ngFor="let status of statusOptions" [value]="status">
+                      {{ getStatusLabel(status) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Type de Service</mat-label>
+                  <mat-select formControlName="serviceType">
+                    <mat-option value="">Tous les services</mat-option>
+                    <mat-option *ngFor="let service of serviceTypeOptions" [value]="service">
+                      {{ getServiceTypeLabel(service) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Date Enlèvement (De)</mat-label>
+                  <input matInput [matDatepicker]="pickupFromPicker" formControlName="pickupDateFrom">
+                  <mat-datepicker-toggle matSuffix [for]="pickupFromPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #pickupFromPicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Date Enlèvement (À)</mat-label>
+                  <input matInput [matDatepicker]="pickupToPicker" formControlName="pickupDateTo">
+                  <mat-datepicker-toggle matSuffix [for]="pickupToPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #pickupToPicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>ID Client</mat-label>
+                  <input matInput formControlName="clientId" placeholder="ID du client" type="number">
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="search-actions">
+              <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+                <i class="fas fa-search"></i>
+                Rechercher
+              </button>
+              <button mat-stroked-button type="button" (click)="onReset()" [disabled]="loading">
+                <i class="fas fa-undo"></i>
+                Réinitialiser
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Shipments Table -->
+        <div class="col-lg-8">
+          <mat-card class="table-card">
+            <mat-card-header>
+              <mat-card-title>
+                <i class="fas fa-list"></i>
+                Liste des Colis
+              </mat-card-title>
+              <div class="spacer"></div>
+              <mat-spinner diameter="30" *ngIf="loading"></mat-spinner>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="table-container">
+                <table mat-table [dataSource]="dataSource" matSort class="shipments-table">
+                  <!-- Tracking Number Column -->
+                  <ng-container matColumnDef="trackingNumber">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>N° Suivi</th>
+                    <td mat-cell *matCellDef="let shipment">
+                      <span class="tracking-number">{{ shipment.trackingNumber }}</span>
+                    </td>
+                  </ng-container>
+
+                  <!-- Sender Column -->
+                  <ng-container matColumnDef="senderName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Expéditeur</th>
+                    <td mat-cell *matCellDef="let shipment">{{ shipment.senderName }}</td>
+                  </ng-container>
+
+                  <!-- Recipient Column -->
+                  <ng-container matColumnDef="recipientName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Destinataire</th>
+                    <td mat-cell *matCellDef="let shipment">{{ shipment.recipientName }}</td>
+                  </ng-container>
+
+                  <!-- Status Column -->
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+                    <td mat-cell *matCellDef="let shipment">
+                      <mat-chip 
+                        [ngClass]="'status-' + getStatusColor(shipment.status)"
+                        [class.overdue]="isOverdue(shipment)">
+                        {{ getStatusLabel(shipment.status) }}
+                      </mat-chip>
+                    </td>
+                  </ng-container>
+
+                  <!-- Service Type Column -->
+                  <ng-container matColumnDef="serviceType">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Service</th>
+                    <td mat-cell *matCellDef="let shipment">
+                      {{ getServiceTypeLabel(shipment.serviceType) }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Pickup Date Column -->
+                  <ng-container matColumnDef="pickupDate">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Enlèvement</th>
+                    <td mat-cell *matCellDef="let shipment">
+                      {{ formatDate(shipment.pickupDate) }}
+                    </td>
+                  </ng-container>
+
+                  <!-- Expected Delivery Column -->
+                  <ng-container matColumnDef="expectedDelivery">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Livraison Prévue</th>
+                    <td mat-cell *matCellDef="let shipment">
+                      <span [class.overdue]="isOverdue(shipment)">
+                        {{ formatDate(shipment.expectedDeliveryDate) }}
+                      </span>
+                    </td>
+                  </ng-container>
+
+                  <!-- Actions Column -->
+                  <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let shipment">
+                      <button mat-icon-button 
+                              matTooltip="Voir détails" 
+                              (click)="onSelectShipment(shipment)"
+                              [class.selected]="selectedShipment?.id === shipment.id">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                      <button mat-icon-button 
+                              matTooltip="Imprimer étiquette" 
+                              (click)="onPrintLabel(shipment)">
+                        <mat-icon>print</mat-icon>
+                      </button>
+                      <button mat-icon-button 
+                              matTooltip="Supprimer" 
+                              (click)="onDeleteShipment(shipment)"
+                              color="warn">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                      (click)="onSelectShipment(row)"
+                      [class.selected-row]="selectedShipment?.id === row.id"></tr>
+                </table>
+
+                <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" 
+                               showFirstLastButtons
+                               aria-label="Sélectionner la page des colis">
+                </mat-paginator>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Shipment Details Panel -->
+        <div class="col-lg-4">
+          <mat-card class="details-card" *ngIf="selectedShipment">
+            <mat-card-header>
+              <mat-card-title>
+                <i class="fas fa-info-circle"></i>
+                Détails du Colis
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <!-- Shipment Overview -->
+              <div class="detail-section">
+                <h4>Informations Générales</h4>
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="label">N° de Suivi:</span>
+                    <span class="value tracking-highlight">{{ selectedShipment.trackingNumber }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Statut:</span>
+                    <mat-chip [ngClass]="'status-' + getStatusColor(selectedShipment.status)">
+                      {{ getStatusLabel(selectedShipment.status) }}
+                    </mat-chip>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Service:</span>
+                    <span class="value">{{ selectedShipment.serviceType ? getServiceTypeLabel(selectedShipment.serviceType) : 'Non défini' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Poids:</span>
+                    <span class="value">{{ selectedShipment.packageWeight || 'Non défini' }} kg</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sender/Recipient Info -->
+              <div class="detail-section">
+                <h4>Expéditeur</h4>
+                <div class="contact-info">
+                  <div><strong>{{ selectedShipment.senderName }}</strong></div>
+                  <div>{{ selectedShipment.senderAddress }}</div>
+                  <div>{{ selectedShipment.senderPhone }}</div>
+                  <div *ngIf="selectedShipment.senderEmail">{{ selectedShipment.senderEmail }}</div>
+                </div>
+              </div>
+
+              <div class="detail-section">
+                <h4>Destinataire</h4>
+                <div class="contact-info">
+                  <div><strong>{{ selectedShipment.recipientName }}</strong></div>
+                  <div>{{ selectedShipment.recipientAddress }}</div>
+                  <div>{{ selectedShipment.recipientPhone }}</div>
+                  <div *ngIf="selectedShipment.recipientEmail">{{ selectedShipment.recipientEmail }}</div>
+                </div>
+              </div>
+
+              <!-- Status Update -->
+              <div class="detail-section">
+                <h4>Mise à Jour du Statut</h4>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Nouveau Statut</mat-label>
+                  <mat-select #statusSelect>
+                    <mat-option *ngFor="let status of statusOptions" [value]="status">
+                      {{ getStatusLabel(status) }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <button mat-raised-button 
+                        color="primary" 
+                        class="w-100"
+                        (click)="onUpdateStatus(selectedShipment, statusSelect.value)"
+                        [disabled]="!statusSelect.value">
+                  <i class="fas fa-sync"></i>
+                  Mettre à Jour
+                </button>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="detail-actions">
+                <button mat-stroked-button 
+                        class="w-100 mb-2"
+                        (click)="onAddTrackingEvent(selectedShipment)">
+                  <i class="fas fa-plus"></i>
+                  Ajouter Événement
+                </button>
+                <button mat-stroked-button 
+                        class="w-100"
+                        (click)="onPrintLabel(selectedShipment)">
+                  <i class="fas fa-print"></i>
+                  Imprimer Étiquette
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Tracking Events -->
+          <mat-card class="events-card" *ngIf="selectedShipment && trackingEvents.length > 0">
+            <mat-card-header>
+              <mat-card-title>
+                <i class="fas fa-history"></i>
+                Historique de Suivi
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="timeline">
+                <div class="timeline-item" 
+                     *ngFor="let event of trackingEvents; let first = first"
+                     [class.latest]="first">
+                  <div class="timeline-marker" [ngClass]="'status-' + getStatusColor(event.status)">
+                    <i class="fas fa-circle"></i>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <h6 class="timeline-title">{{ getStatusLabel(event.status) }}</h6>
+                      <span class="timeline-date">{{ formatDateTime(event.eventDate) }}</span>
+                    </div>
+                    <p class="timeline-description" *ngIf="event.description">
+                      {{ event.description }}
+                    </p>
+                    <div class="timeline-meta">
+                      <div *ngIf="event.location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ event.location }}
+                      </div>
+                      <div *ngIf="event.operatorName">
+                        <i class="fas fa-user"></i>
+                        {{ event.operatorName }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

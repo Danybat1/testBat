@@ -1,0 +1,138 @@
+// Currency Selector Component Styles
+.currency-selector {
+  .currency-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #667eea;
+    color: #667eea;
+    background: white;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-color: #667eea;
+      transform: translateY(-1px);
+    }
+
+    .currency-symbol {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .currency-code {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+  }
+
+  .currency-dropdown {
+    min-width: 280px;
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 0;
+
+    .dropdown-header {
+      font-weight: 600;
+      color: #495057;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .currency-item {
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      &:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+      }
+
+      &.active {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      .currency-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .currency-symbol {
+          width: 30px;
+          height: 30px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          font-size: 0.9rem;
+        }
+
+        .currency-details {
+          display: flex;
+          flex-direction: column;
+
+          .currency-name {
+            font-weight: 500;
+            color: #495057;
+            line-height: 1.2;
+          }
+
+          .currency-code {
+            color: #6c757d;
+            font-size: 0.8rem;
+            line-height: 1;
+          }
+        }
+      }
+
+      .currency-check {
+        color: #28a745;
+        font-size: 0.9rem;
+      }
+    }
+
+    .exchange-rates {
+      padding: 0.75rem 1rem;
+      background-color: #f8f9fa;
+      border-radius: 0.5rem;
+      margin: 0.5rem;
+
+      .rate-list {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0;
+        color: #495057;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 767.98px) {
+  .currency-selector {
+    .currency-dropdown {
+      min-width: 250px;
+    }
+
+    .currency-btn {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
+  }
+}

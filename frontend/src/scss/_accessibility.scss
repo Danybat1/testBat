@@ -1,0 +1,457 @@
+// FreightOps WCAG Accessibility Compliance Styles
+
+// Focus Management
+*:focus-visible {
+  outline: 2px solid $primary-500;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+// Skip Links
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: $primary-500;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: $border-radius;
+  z-index: $zindex-tooltip;
+  font-weight: $font-weight-medium;
+  
+  &:focus {
+    top: 6px;
+  }
+}
+
+// Screen Reader Only Content
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.sr-only-focusable:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: inherit !important;
+  margin: inherit !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+// High Contrast Mode Support
+@media (prefers-contrast: high) {
+  // Ensure sufficient contrast for all interactive elements
+  .btn {
+    border: 2px solid currentColor;
+    
+    &:hover {
+      background: currentColor;
+      color: white;
+    }
+  }
+  
+  .form-control,
+  .form-select {
+    border: 2px solid $neutral-700;
+    
+    &:focus {
+      border-color: $primary-500;
+      box-shadow: 0 0 0 2px rgba($primary-500, 0.5);
+    }
+  }
+  
+  .card {
+    border: 2px solid $neutral-400;
+  }
+  
+  .nav-link {
+    border: 1px solid transparent;
+    
+    &:hover {
+      border-color: currentColor;
+    }
+    
+    &.active {
+      border-color: white;
+    }
+  }
+  
+  // Ensure text has sufficient contrast
+  .text-muted {
+    color: $neutral-700 !important;
+  }
+  
+  .form-text {
+    color: $neutral-600 !important;
+  }
+}
+
+// Reduced Motion Support
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Color Blind Friendly Patterns
+.status-indicator {
+  position: relative;
+  
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+  }
+  
+  &.status-success {
+    &::before {
+      background: $success-500;
+    }
+    
+    // Add pattern for color blind users
+    &::after {
+      content: '✓';
+      font-weight: bold;
+      color: $success-600;
+      margin-left: 0.25rem;
+    }
+  }
+  
+  &.status-warning {
+    &::before {
+      background: $warning-500;
+    }
+    
+    &::after {
+      content: '⚠';
+      color: $warning-600;
+      margin-left: 0.25rem;
+    }
+  }
+  
+  &.status-danger {
+    &::before {
+      background: $danger-500;
+    }
+    
+    &::after {
+      content: '✗';
+      font-weight: bold;
+      color: $danger-600;
+      margin-left: 0.25rem;
+    }
+  }
+}
+
+// Form Accessibility Enhancements
+.form-group {
+  .form-label {
+    // Ensure labels are properly associated
+    cursor: pointer;
+    
+    &.required {
+      &::after {
+        content: ' *';
+        color: $danger-500;
+        font-weight: bold;
+      }
+    }
+  }
+  
+  .invalid-feedback {
+    display: block;
+    font-size: $font-size-sm;
+    color: $danger-600;
+    margin-top: 0.25rem;
+  }
+  
+  .valid-feedback {
+    display: block;
+    font-size: $font-size-sm;
+    color: $success-600;
+    margin-top: 0.25rem;
+  }
+}
+
+// Button Accessibility
+.btn {
+  // Ensure minimum touch target size (44x44px)
+  min-height: 44px;
+  min-width: 44px;
+  
+  @include mobile-only {
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+  }
+  
+  // Loading state accessibility
+  &[aria-busy="true"] {
+    position: relative;
+    color: transparent;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+// Table Accessibility
+.table {
+  // Ensure table headers are properly marked
+  th {
+    font-weight: $font-weight-semibold;
+    
+    &[scope="col"] {
+      background: $neutral-100;
+    }
+    
+    &[scope="row"] {
+      background: $neutral-50;
+      font-weight: $font-weight-medium;
+    }
+  }
+  
+  // Zebra striping for better readability
+  tbody tr:nth-child(even) {
+    background: rgba($neutral-100, 0.5);
+  }
+  
+  // Focus styles for keyboard navigation
+  td:focus,
+  th:focus {
+    outline: 2px solid $primary-500;
+    outline-offset: -2px;
+  }
+}
+
+// Modal Accessibility
+.modal {
+  // Ensure focus is trapped within modal
+  &.show {
+    .modal-dialog {
+      transform: none;
+    }
+  }
+  
+  .modal-header {
+    .btn-close {
+      // Ensure close button is accessible
+      min-width: 44px;
+      min-height: 44px;
+      
+      &:focus-visible {
+        outline: 2px solid white;
+        outline-offset: -2px;
+      }
+    }
+  }
+}
+
+// Dropdown Accessibility
+.dropdown {
+  .dropdown-toggle {
+    // Ensure dropdown toggles are accessible
+    &[aria-expanded="true"] {
+      &::after {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  
+  .dropdown-menu {
+    // Ensure dropdown items are keyboard navigable
+    .dropdown-item {
+      &:focus {
+        background: $primary-100;
+        color: $primary-700;
+        outline: none;
+      }
+      
+      &[aria-disabled="true"] {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+// Alert Accessibility
+.alert {
+  // Ensure alerts are announced to screen readers
+  &[role="alert"] {
+    border-left: 4px solid currentColor;
+  }
+  
+  .alert-link {
+    font-weight: $font-weight-semibold;
+    text-decoration: underline;
+    
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+// Navigation Accessibility
+.nav {
+  .nav-link {
+    // Ensure nav links have proper focus states
+    &:focus-visible {
+      outline: 2px solid $primary-500;
+      outline-offset: 2px;
+    }
+    
+    &[aria-current="page"] {
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+// Breadcrumb Accessibility
+.breadcrumb {
+  .breadcrumb-item {
+    &[aria-current="page"] {
+      font-weight: $font-weight-semibold;
+      background: rgba($primary-500, 0.1);
+      border-radius: $border-radius;
+    }
+  }
+}
+
+// Pagination Accessibility
+.pagination {
+  .page-link {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:focus-visible {
+      outline: 2px solid $primary-500;
+      outline-offset: 2px;
+      z-index: 1;
+    }
+    
+    &[aria-disabled="true"] {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}
+
+// Progress Accessibility
+.progress {
+  // Ensure progress bars are accessible
+  &[role="progressbar"] {
+    .progress-bar {
+      transition: width 0.3s ease;
+    }
+  }
+}
+
+// Tooltip Accessibility
+.tooltip {
+  // Ensure tooltips don't interfere with screen readers
+  &[role="tooltip"] {
+    font-size: $font-size-sm;
+    
+    .tooltip-inner {
+      max-width: 200px;
+      text-align: center;
+    }
+  }
+}
+
+// Color Contrast Utilities
+.bg-accessible-primary {
+  background-color: $primary-600;
+  color: white;
+}
+
+.bg-accessible-secondary {
+  background-color: $secondary-600;
+  color: white;
+}
+
+.bg-accessible-success {
+  background-color: $success-600;
+  color: white;
+}
+
+.bg-accessible-warning {
+  background-color: $warning-600;
+  color: $neutral-900;
+}
+
+.bg-accessible-danger {
+  background-color: $danger-600;
+  color: white;
+}
+
+// Text contrast utilities
+.text-contrast-aa {
+  // Ensures AA level contrast (4.5:1)
+  color: $neutral-700;
+}
+
+.text-contrast-aaa {
+  // Ensures AAA level contrast (7:1)
+  color: $neutral-800;
+}
+
+// Print accessibility
+@media print {
+  // Ensure content is accessible when printed
+  .sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    clip: auto !important;
+    overflow: visible !important;
+  }
+  
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: smaller;
+  }
+  
+  .btn {
+    border: 1px solid $neutral-400;
+  }
+}

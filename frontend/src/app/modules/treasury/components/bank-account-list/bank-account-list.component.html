@@ -1,0 +1,189 @@
+<div class="bank-account-list">
+  <div class="page-header">
+    <h1>Gestion des Comptes Bancaires</h1>
+    <button mat-raised-button color="primary" (click)="createBankAccount()">
+      <mat-icon>add</mat-icon>
+      Nouveau Compte
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" 
+                 placeholder="Nom, numéro ou banque...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [(value)]="statusFilter" (selectionChange)="onStatusFilterChange()">
+            <mat-option value="all">Tous</mat-option>
+            <mat-option value="active">Actifs</mat-option>
+            <mat-option value="inactive">Inactifs</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Banque</mat-label>
+          <mat-select [(value)]="bankFilter" (selectionChange)="onBankFilterChange()">
+            <mat-option value="all">Toutes</mat-option>
+            <mat-option *ngFor="let bank of getUniqueBanks()" [value]="bank">
+              {{ bank }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Solde</mat-label>
+          <mat-select [(value)]="balanceFilter" (selectionChange)="onBalanceFilterChange()">
+            <mat-option value="all">Tous</mat-option>
+            <mat-option value="positive">Positif</mat-option>
+            <mat-option value="zero">Zéro</mat-option>
+            <mat-option value="negative">Négatif</mat-option>
+            <mat-option value="low">Faible (&lt; 50 000)</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="exportToExcel()">
+          <mat-icon>file_download</mat-icon>
+          Exporter
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="!loading">
+    <span>{{ filteredBankAccounts.length }} compte(s) trouvé(s)</span>
+  </div>
+
+  <!-- Bank Accounts Table -->
+  <mat-card class="table-card" *ngIf="!loading">
+    <div class="table-container">
+      <table mat-table [dataSource]="filteredBankAccounts" class="bank-accounts-table">
+        <!-- Account Name Column -->
+        <ng-container matColumnDef="accountName">
+          <th mat-header-cell *matHeaderCellDef>Nom du Compte</th>
+          <td mat-cell *matCellDef="let account">
+            <div class="name-cell">
+              <strong>{{ account.accountName }}</strong>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Account Number Column -->
+        <ng-container matColumnDef="accountNumber">
+          <th mat-header-cell *matHeaderCellDef>Numéro</th>
+          <td mat-cell *matCellDef="let account">
+            <code class="account-number">{{ account.accountNumber }}</code>
+          </td>
+        </ng-container>
+
+        <!-- Bank Name Column -->
+        <ng-container matColumnDef="bankName">
+          <th mat-header-cell *matHeaderCellDef>Banque</th>
+          <td mat-cell *matCellDef="let account">
+            {{ account.bankName }}
+          </td>
+        </ng-container>
+
+        <!-- Current Balance Column -->
+        <ng-container matColumnDef="currentBalance">
+          <th mat-header-cell *matHeaderCellDef>Solde Actuel</th>
+          <td mat-cell *matCellDef="let account">
+            <span class="balance" [ngClass]="getBalanceColor(account.currentBalance)">
+              {{ formatCurrency(account.currentBalance) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Initial Balance Column -->
+        <ng-container matColumnDef="initialBalance">
+          <th mat-header-cell *matHeaderCellDef>Solde Initial</th>
+          <td mat-cell *matCellDef="let account">
+            {{ formatCurrency(account.initialBalance) }}
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let account">
+            <mat-chip [color]="account.active ? 'primary' : 'basic'" selected>
+              {{ account.active ? 'Actif' : 'Inactif' }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Created Date Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Date de Création</th>
+          <td mat-cell *matCellDef="let account">
+            {{ formatDate(account.createdAt) }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let account">
+            <div class="actions-cell">
+              <button mat-icon-button [matMenuTriggerFor]="actionMenu" 
+                      matTooltip="Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              
+              <mat-menu #actionMenu="matMenu">
+                <button mat-menu-item (click)="viewBankAccount(account)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>Voir détails</span>
+                </button>
+                <button mat-menu-item (click)="editBankAccount(account)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Modifier</span>
+                </button>
+                <button mat-menu-item (click)="adjustBalance(account)">
+                  <mat-icon>account_balance</mat-icon>
+                  <span>Ajuster solde</span>
+                </button>
+                <button mat-menu-item (click)="toggleBankAccountStatus(account)">
+                  <mat-icon>{{ account.active ? 'block' : 'check_circle' }}</mat-icon>
+                  <span>{{ account.active ? 'Désactiver' : 'Activer' }}</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteBankAccount(account)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  <span>Supprimer</span>
+                </button>
+              </mat-menu>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+            class="table-row" (click)="viewBankAccount(row)"></tr>
+      </table>
+
+      <!-- No Data Message -->
+      <div class="no-data" *ngIf="filteredBankAccounts.length === 0">
+        <mat-icon>account_balance</mat-icon>
+        <h3>Aucun compte bancaire trouvé</h3>
+        <p>Aucun compte ne correspond à vos critères de recherche.</p>
+        <button mat-raised-button color="primary" (click)="createBankAccount()">
+          Créer un nouveau compte
+        </button>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Chargement des comptes bancaires...</p>
+  </div>
+</div>

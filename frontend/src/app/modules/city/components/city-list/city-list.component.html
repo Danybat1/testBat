@@ -1,0 +1,69 @@
+<div class="city-list-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <i class="bi bi-geo-alt"></i>
+      Gestion des Villes
+    </h2>
+    <button class="btn btn-primary" (click)="navigateToNewCity()">
+      <i class="bi bi-plus-circle"></i>
+      Nouvelle Ville
+    </button>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input 
+        type="text" 
+        placeholder="Rechercher une ville ou code IATA..." 
+        [(ngModel)]="searchTerm"
+        class="search-input">
+    </div>
+  </div>
+
+  <div class="table-container" *ngIf="!loading">
+    <table class="cities-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom de la ville</th>
+          <th>Code IATA</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let city of filteredCities">
+          <td>{{ city.id }}</td>
+          <td>{{ city.name }}</td>
+          <td>
+            <span class="iata-code">{{ city.iataCode }}</span>
+          </td>
+          <td class="actions">
+            <button 
+              class="btn btn-sm btn-outline-primary" 
+              (click)="editCity(city.id!)"
+              title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-danger" 
+              (click)="deleteCity(city.id!)"
+              title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="no-results" *ngIf="filteredCities.length === 0">
+      <i class="bi bi-inbox"></i>
+      <p>Aucune ville trouvée</p>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <i class="bi bi-arrow-clockwise spin"></i>
+    <p>Chargement des villes...</p>
+  </div>
+</div>
